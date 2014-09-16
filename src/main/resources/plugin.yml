@@ -1,0 +1,30 @@
+name: ResorceDungones
+main: com.thekarura.bukkit.plugin.resorcedungons.ResorceDungeons
+version: 1.0.0
+author: the_karura
+description: It is a plugin that generates the Dungeons.
+commands:
+   RDHelp:
+      description: plugin helps.
+      aliases: [rdh]
+      usage: /<command>
+      permission: ResorceDungons.Help
+      permission-message: You don't have <permission>
+   RDGenerate:
+      description: Generating Dungeon.
+      aliases: [rdg]
+      usage: /<command> [Dungeons]
+      permission: ResorceDungons.Generate
+      permission-message: You don't have <permission>
+   RDVersion:
+      description: Version list.
+      aliases: [rdr]
+      usage: /<command>
+      permission: ResorceDungons.Version
+      permission-message: You don't have <permission>
+   RDReload:
+      description: Reload plugin.
+      aliases: [rdr]
+      usage: /<command>
+      permission: ResorceDungons.Reload
+      permission-message: You don't have <permission>
