@@ -21,8 +21,6 @@ public class DungeonJungleCave {
 	@SuppressWarnings("deprecation")
 	public void setJungleCave(Location loc){
 		
-		System.out.println("生成を開始します");
-		
 		Random random = new Random();
 		Chunk chunk = loc.getChunk();
 		
@@ -38,7 +36,7 @@ public class DungeonJungleCave {
 				if (topy == 0){ continue; } //座標0であれば処理をせず次へ渡す
 				for (int y = 0; y < random.nextInt(10-1)+1; y++){
 					if (!chunk.getBlock(cx, topy - y, cz).getType().isSolid()){
-						chunk.getBlock(cx, topy - y, cz).setTypeIdAndData(Material.VINE.getId(), (byte) 15, true);
+						chunk.getBlock(cx, topy - y, cz).setTypeIdAndData(Material.VINE.getId(), (byte) 15, false);
 					}
 				}
 				
@@ -47,12 +45,10 @@ public class DungeonJungleCave {
 				if (flooty == 0){ continue; } //座標0であれば処理をせず次へ渡す
 				int blockid = random.nextInt(2);
 				
-				chunk.getBlock(cx, flooty, cz).setTypeIdAndData(Material.GRASS.getId(),(byte) 0,true);
+				chunk.getBlock(cx, flooty, cz).setTypeIdAndData(Material.GRASS.getId(),(byte) 0,false);
 				
 			}
 		}
-		
-		System.out.println("生成が終わりました");
 		
 	}
 	
@@ -176,6 +172,7 @@ public class DungeonJungleCave {
 	 * @param cx
 	 * @param cz
 	 */
+	@SuppressWarnings("deprecation")
 	public void replaceBlock(Location loc ,Chunk chunk , Random random,int cx ,int cz){
 		
 		Random raundom = random;
@@ -194,7 +191,6 @@ public class DungeonJungleCave {
 				switch(chunk.getBlock(x, y, z).getType()){
 				case STONE:
 				case DIRT:
-				case GRAVEL:
 				case CLAY:
 					
 					int blockid = raundom.nextInt(3);
@@ -215,7 +211,7 @@ public class DungeonJungleCave {
 					break;
 					}
 					
-					chunk.getBlock(x, y, z).setTypeIdAndData(material.getId(),(byte) 0, true);
+					chunk.getBlock(x, y, z).setTypeIdAndData(material.getId(),(byte) 0, false);
 				break;
 				default:break;
 				}

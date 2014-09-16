@@ -2,14 +2,13 @@ package com.thekarura.bukkit.plugin.resorcedungons.listener;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.Sign;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkPopulateEvent;
 
 import com.thekarura.bukkit.plugin.resorcedungons.ResorceDungeons;
+import com.thekarura.bukkit.plugin.resorcedungons.manager.DungeonJungleCave;
 
 public class RDChunkListener implements Listener {
 	
@@ -84,18 +83,8 @@ public class RDChunkListener implements Listener {
 			case JUNGLE:
 			case JUNGLE_HILLS:
 				
-				//地面の高さを習得
-				int y = getGround(loc);
-				
-				block.getRelative(0, y, 0).setTypeIdAndData(Material.COMMAND.getId(),(byte) 0, false);
-				block.getRelative(0, y + 1, 0).setTypeIdAndData(Material.SIGN_POST.getId(),(byte) 0, false);
-				System.out.println(block.getLocation(loc).add(0, y, 0).getBlock());
-				
-				//ダンジョンジャングルを登録
-				Sign sign = (Sign) block.getRelative(0, y + 1, 0).getState();
-				sign.setLine(0, "[RDungeons]");
-				sign.setLine(1, "JungleCave");
-				sign.update();
+				//ジャングル地下ダンジョン
+				new DungeonJungleCave().setJungleCave(loc);
 				
 				break;
 			case MUSHROOM_ISLAND:
