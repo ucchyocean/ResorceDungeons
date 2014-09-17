@@ -1,17 +1,23 @@
 package com.thekarura.bukkit.plugin.resorcedungons.listener;
 
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Creature;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 
 import com.thekarura.bukkit.plugin.resorcedungons.ResorceDungeons;
 
 public class RDEntityListener implements Listener {
 	
+	// ++ instance ++ //
 	private ResorceDungeons instance = ResorceDungeons.getInstance();
 	
+	//mob固有設定のための設定
+	private Creature mob = null;
+	
+	// ++ Constructor ++ //
 	public RDEntityListener(final ResorceDungeons resorcedungeons) {
 		this.instance = resorcedungeons;
 	}
@@ -21,15 +27,18 @@ public class RDEntityListener implements Listener {
 	public void JungleCaveEntityChenge(CreatureSpawnEvent event){
 		
 		//ダンジョンワールドのみ有効化
-		if (event.getEntity().getWorld().equals(instance.getConfigs().getDungeonWorld())){
+		if (event.getEntity().getWorld() == Bukkit.getWorld(instance.getConfigs().getDungeonWorld())){
 			
 			//自然湧きのみ固定
-			if (event.getSpawnReason().equals(SpawnReason.NATURAL)){
+			switch (event.getSpawnReason()){
+			case DEFAULT:
+			case NATURAL:
+			case CHUNK_GEN:
 				
 				//バイオーム指定
 				switch (event.getLocation().getBlock().getBiome()){
 				
-				//ジャングルのみ
+				//ジャングルバイオーム
 				case JUNGLE:
 				case JUNGLE_HILLS:
 					
@@ -73,6 +82,8 @@ public class RDEntityListener implements Listener {
 				
 				}
 				
+			break;
+			default:break;
 			}
 			
 		}
