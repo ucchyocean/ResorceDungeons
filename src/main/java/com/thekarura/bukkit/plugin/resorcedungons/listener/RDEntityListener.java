@@ -1,6 +1,5 @@
 package com.thekarura.bukkit.plugin.resorcedungons.listener;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
@@ -27,7 +26,7 @@ public class RDEntityListener implements Listener {
 	public void JungleCaveEntityChenge(CreatureSpawnEvent event){
 		
 		//ダンジョンワールドのみ有効化
-		if (event.getEntity().getWorld() == Bukkit.getWorld(instance.getConfigs().getDungeonWorld())){
+		if (event.getLocation().getWorld().getName().equals(instance.getConfigs().getDungeonWorld())){
 			
 			//自然湧きのみ固定
 			switch (event.getSpawnReason()){

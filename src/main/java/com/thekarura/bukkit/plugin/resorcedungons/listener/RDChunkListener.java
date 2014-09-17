@@ -1,6 +1,5 @@
 package com.thekarura.bukkit.plugin.resorcedungons.listener;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
@@ -32,7 +31,7 @@ public class RDChunkListener implements Listener {
 		 */
 		
 		//ダンジョンワールドのみ有効化
-		if (event.getWorld() == Bukkit.getWorld(instance.getConfigs().getDungeonWorld())){
+		if (event.getWorld().getName().equals(instance.getConfigs().getDungeonWorld())){
 			
 			//チャンクの0,0,0座標を習得
 			Location loc = event.getChunk().getBlock(0, 0, 0).getLocation();
@@ -44,8 +43,6 @@ public class RDChunkListener implements Listener {
 			switch (loc.getBlock().getBiome()){
 			
 			case BEACH:
-				
-				
 				
 				break;
 			case DESERT:

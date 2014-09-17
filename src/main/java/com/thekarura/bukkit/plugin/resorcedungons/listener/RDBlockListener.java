@@ -2,7 +2,6 @@ package com.thekarura.bukkit.plugin.resorcedungons.listener;
 
 import java.util.logging.Logger;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -13,7 +12,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 import com.thekarura.bukkit.plugin.resorcedungons.ResorceDungeons;
-import com.thekarura.bukkit.plugin.resorcedungons.manager.DungeonJungleCave;
 import com.thekarura.bukkit.plugin.resorcedungons.manager.DungeonMossy;
 
 /**
@@ -46,11 +44,12 @@ public class RDBlockListener implements Listener {
 		
 		final Player player = event.getPlayer();
 		
-		if (player.getWorld() == Bukkit.getWorld(instance.getConfigs().getDungeonWorld())){
+		//ダンジョンワールドのみ有効化
+		if (player.getWorld().getName().equals(instance.getConfigs().getDungeonWorld())){
 			
 			//デバッグ中なのでこれは隠おきましょう
 			//クリエイティブモードであれば実行させない
-			//if (player.getGameMode() == GameMode.CREATIVE){ return; }
+			//if (player.getGameMode().equals(GameMode.CREATIVE)){ return; }
 			
 			//感知範囲(コンフィグで調整予定)
 			int radius = 50;
@@ -93,13 +92,6 @@ public class RDBlockListener implements Listener {
 									
 								}
 								
-								//JungleCaveを生成します
-								if (sign.getLine(1).equals("JungleCave")){
-									
-									remove(world, i, y, j);
-									new DungeonJungleCave().setJungleCave(loc);
-									
-								}
 							}
 						}
 					}
