@@ -130,7 +130,7 @@ public class DungeonBuilder {
 								str = br.readLine(); strint++;
 								block.getRelative(load_posx, load_posy, load_posz).
 								setTypeIdAndData(Material.CHEST.getId(),(byte) 0, load_Physics);
-								new DungeonChest().setChest(str, load_posz, load_posz, load_posz, loc);
+								new DungeonChest().setChest(str, loc);
 							}
 							//鉱石をランダムで配置します。
 							if (str.equalsIgnoreCase("-Ore")) {

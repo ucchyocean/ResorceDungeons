@@ -30,7 +30,7 @@ public class DungeonChest {
 	
 	private int strint = 1;
 	
-	public void setChest(String chestid, int x, int y, int z, Location loc){
+	public void setChest(String chestid, Location loc){
 		
 		String chestdir = instance.getConfigs().getChestfile();
 		
@@ -56,6 +56,7 @@ public class DungeonChest {
 				HashMap<Integer,Integer> level = new HashMap<Integer,Integer>();
 				
 				while ((str = br.readLine()) != null ) {
+					
 					//ファイル検出用の処理
 					if ( checkfile == true ){
 						if (str.equalsIgnoreCase("Chest:")){ 
@@ -63,6 +64,7 @@ public class DungeonChest {
 							
 							checkfile = false;
 						}
+						
 					} else {
 						
 						//開始命令
@@ -79,17 +81,14 @@ public class DungeonChest {
 							//アイテムの種類を設定します。
 							str = br.readLine(); strint++;
 							material = Material.getMaterial(str);
-							System.out.println("-Material ="+str);
 							
 							//アイテムの量を設定します。
 							str = br.readLine(); strint++;
 							amount = Integer.valueOf(str);
-							System.out.println("-Amount ="+str);
 							
 							//ダメージ値を設定します。
 							str = br.readLine(); strint++;
 							damage = Short.valueOf(str);
-							System.out.println("-Damage ="+str);
 							
 							ItemStack item = new ItemStack(material ,amount ,damage);
 							ItemMeta itemm = item.getItemMeta();
@@ -102,7 +101,6 @@ public class DungeonChest {
 									str = br.readLine(); strint++;
 									name = str;
 									itemm.setDisplayName(ColorFormat(name));
-									System.out.println("-Name ="+str);
 								}
 								//アイテム説明を追加させます。
 								if (str.equalsIgnoreCase("-lore")){
@@ -111,7 +109,6 @@ public class DungeonChest {
 										str = br.readLine(); strint++;
 										if (!(str.equalsIgnoreCase(":lore"))){
 											lore.add(ColorFormat(str));
-											System.out.println("-lore ="+str);
 										}
 									}
 									itemm.setLore(lore);
@@ -126,7 +123,6 @@ public class DungeonChest {
 											str = br.readLine(); strint++;
 											level.put(l, Integer.valueOf(str));
 										}
-										System.out.println(enchantment.get(l) + " , " + level.get(l));
 										l++;
 									}
 								}
@@ -149,7 +145,7 @@ public class DungeonChest {
 										for (int l = 0;enchantment.get(l) != null;l++){
 											item.addUnsafeEnchantment(enchantment.get(l), level.get(l));
 										}
-										inv.setItem(maxint,item);
+										inv.addItem(item);
 										maxint++;
 										System.out.println("-配置完了");
 									}

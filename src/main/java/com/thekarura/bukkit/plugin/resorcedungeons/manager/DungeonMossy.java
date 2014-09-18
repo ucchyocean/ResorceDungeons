@@ -9,8 +9,11 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.CreatureSpawner;
+import org.bukkit.entity.EntityType;
 
 import com.thekarura.bukkit.plugin.resorcedungeons.ResorceDungeons;
+import com.thekarura.bukkit.plugin.resorcedungeons.manager.buillder.DungeonChest;
 
 public class DungeonMossy {
 	
@@ -23,7 +26,7 @@ public class DungeonMossy {
 	@SuppressWarnings("deprecation")
 	public void setDungeonMossy(Location loc){
 		
-		// ** ダンジョン構成 **
+		// ++ ダンジョン構成 ++
 		Block block = loc.getBlock();
 		//ブロックを指定
 		Material d_b_outline = Material.COBBLESTONE;
@@ -42,6 +45,10 @@ public class DungeonMossy {
 		int l_5 = 0;
 		int l_6 = 0;
 		
+		//スポナーの数
+		int min_s = 2;	//最小数
+		int max_s = 4;	//最大数
+		
 		//一つ前の通路開始始点を保存
 		//
 		HashMap<Integer,Integer> p_xw_x = new HashMap<Integer,Integer>();
@@ -59,12 +66,12 @@ public class DungeonMossy {
 		int l_7 = 0;
 		int l_8 = 0;
 		
-		// ** 区画を分けます。 **
+		// ++ 区画を分けます ++ //
 		//縦に分けます
 		for(int l_1=0 ; l_1 < distrct ; l_1++){		//x
 			for(int l_2=0 ; l_2 < distrct ; l_2++){	//y
 				
-				// ** 部屋の設定 **
+				// ++ 部屋の設定 ++ //
 				
 				//部屋の配置
 				int r_x = Random(d_width  / 3, 3);
@@ -84,7 +91,78 @@ public class DungeonMossy {
 					}
 				}
 				
-				// ** 通路の生成 ** //
+				// ++ スポナーとチェストを配置します ++ //
+				
+				//l_2におけるスポナーの数を決めます
+				int sp_lmax = Random(max_s,min_s);
+				
+				for (int sp_l = 0; sp_l < sp_lmax ; sp_l++){
+					
+					//スポナーの配置場所を決めます
+					int sp_x = Random((r_z + ru_z) - 1,r_z + 1);
+					int sp_z = Random((r_x + ru_x) - 1,r_x + 1);
+					
+					//スポナーの中身をランダムで決めます
+					int sp_r = Random(4,0);
+					
+					//チェストの中身を決めます(Name固定)
+					block.getRelative(l_5+sp_z, 1, l_6+sp_x).
+					setTypeIdAndData(Material.CHEST.getId(), (byte) 0, true);
+					
+					int c_r = Random(5,0);
+					switch (c_r){
+					case 1:
+						new DungeonChest().setChest("Mossy_Life", new Location(loc.getWorld(),
+						loc.getX() + l_5 + sp_z, loc.getY() + 1, loc.getZ() + l_6 + sp_x));
+					break;
+					case 2:
+						new DungeonChest().setChest("Mossy_Food", new Location(loc.getWorld(),
+						loc.getX() + l_5 + sp_z, loc.getY() + 1, loc.getZ() + l_6 + sp_x));
+					break;
+					case 3:
+						new DungeonChest().setChest("Mossy_Weapon", new Location(loc.getWorld(),
+						loc.getX() + l_5 + sp_z, loc.getY() + 1, loc.getZ() + l_6 + sp_x));
+					break;
+					case 4:
+						new DungeonChest().setChest("Mossy_Protecto", new Location(loc.getWorld(),
+						loc.getX() + l_5 + sp_z, loc.getY() + 1, loc.getZ() + l_6 + sp_x));
+					break;
+					default:
+						new DungeonChest().setChest("Mossy_Other", new Location(loc.getWorld(),
+						loc.getX() + l_5 + sp_z, loc.getY() + 1, loc.getZ() + l_6 + sp_x));
+					break;
+					}
+					
+					//スポナーの操作を行う為に設定します
+					block.getRelative(l_5+sp_z, 2, l_6+sp_x).
+					setTypeIdAndData(Material.MOB_SPAWNER.getId(), (byte) 0, true);
+					CreatureSpawner csp = (CreatureSpawner) block.getRelative(l_5+sp_z, 2, l_6+sp_x).getState();
+					
+					//スポナーの中身を投入します
+					EntityType type = null;
+					switch (sp_r){
+					case 1:
+						//助さん
+						type = EntityType.SKELETON;
+					break;
+					case 2:
+						//蜘蛛
+						type = EntityType.SPIDER;
+					break;
+					case 3:
+						//クリーパー
+						type = EntityType.CREEPER;
+					break;
+					default:
+						//ゾンビ
+						type = EntityType.ZOMBIE;
+					break;
+					}
+					csp.setSpawnedType(type);
+					
+				}
+				
+				// ++ 通路の生成 ++ //
 				//下側
 				int p_x = Random(ru_x-1,1);
 				int p_z = Random(ru_z-1,1);
@@ -99,6 +177,7 @@ public class DungeonMossy {
 							if (!(l_1 == distrct - 1)){
 								setBlock(block,r_x+p_x+l_5, l_y, r_z+ru_z+l_4+l_6, d_b_outline, d_b_outline1);
 								
+								//一つ前の位置情報を保存
 								p_xw_x.put(l_7, r_x+p_x+l_5);
 								p_xw_z.put(l_8, r_z+ru_z+l_4+l_6);
 								
@@ -106,6 +185,7 @@ public class DungeonMossy {
 							if (!(l_2 == distrct - 1)){
 								setBlock(block,r_x+ru_x+l_3+l_5, l_y, r_z+p_z+l_6, d_b_outline, d_b_outline1);
 								
+								//一つ前の位置情報を保存
 								p_xh_x.put(l_7, r_x+ru_x+l_3+l_5);
 								p_xh_z.put(l_8, r_z+p_z+l_6);
 							}
@@ -113,6 +193,7 @@ public class DungeonMossy {
 					}
 				}
 				
+				//一つ前の位置情報を保存
 				p_zw_x.put(l_7, r_x+p_x_+l_5);
 				p_zw_z.put(l_8, l_6-1);
 				
@@ -134,7 +215,9 @@ public class DungeonMossy {
 					}
 				}
 				
+				//一つ前の区画情報を使い通路を繋げます
 				if (!( l_2 == 0 )){
+					
 					if (!( p_zh_z.get(l_8) == p_xh_z.get(l_8 - 1))){
 						
 						if ( p_zh_z.get(l_8) < p_xh_z.get(l_8 - 1)){
@@ -152,9 +235,11 @@ public class DungeonMossy {
 							}
 						}
 					}
+					
 				}
 				
 				if (!( l_1 == 0)){
+					
 					if (!( p_xw_x.get(l_7 - distrct) == p_zw_x.get(l_7) )){
 						
 						if ( p_xw_x.get(l_7 - distrct) < p_zw_x.get(l_7) ){
@@ -173,6 +258,7 @@ public class DungeonMossy {
 						}
 						
 					}
+					
 				}
 				
 				l_7++; //横 多分
@@ -194,6 +280,15 @@ public class DungeonMossy {
 		
 	}
 	
+	/**
+	 * ブロック配置メソッド
+	 * @param b
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @param m1 丸石
+	 * @param m2 苔石
+	 */
 	@SuppressWarnings("deprecation")
 	public void setBlock(Block b ,int x ,int y,int z ,Material m1, Material m2){
 		if (y == 0){
