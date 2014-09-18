@@ -23,7 +23,7 @@ public class DungeonTest {
 	
 	//メイン処理
 	
-	public static void createDungeonTest(Location loc){
+	public void createDungeonTest(Location loc){
 		
 		String dungeonsdir = instanse.getConfigs().getDungeondir();
 		Block block = loc.getBlock();

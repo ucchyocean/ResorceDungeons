@@ -2,7 +2,6 @@ package com.thekarura.bukkit.plugin.resorcedungeons.command;
 
 import java.util.logging.Logger;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -48,17 +47,20 @@ public class GenerateCommand implements CommandExecutor {
 				
 			} else {
 				
-				if (player.getWorld() == Bukkit.getWorld(instance.getConfigs().getDungeonWorld())){
+				if (player.getWorld().getName().equals(instance.getConfigs().getDungeonWorld())){
 					
-					// 確認用であり実用性はないです。
-					
+					//確認用であり実用性はないです。(安全の為製作者限定にしています)
+					//他の鯖では権限によりthe_karuraのIDでも実行出来ないので問題ありません
 					if ( args[0].equals("Test") ) {
-						DungeonTest.createDungeonTest(loc);
+						if ( player.getName().equals("the_karura") ){
+							new DungeonTest().createDungeonTest(loc);
+						} else {
+							player.sendMessage("");
+						}
 						return true;
 					}
 					
 					if ( args[0].equals("Mossy")){
-						sender.sendMessage("Coming soon");
 						new DungeonMossy().setDungeonMossy(loc);
 						return true;
 					}
@@ -68,7 +70,7 @@ public class GenerateCommand implements CommandExecutor {
 					}
 					
 					if ( args[0].equals("Floating")){
-						DungeonFloating.createDungeonFloating(loc);
+						new DungeonFloating().createDungeonFloating(loc);
 						return true;
 					}
 					

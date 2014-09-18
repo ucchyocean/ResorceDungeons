@@ -15,6 +15,12 @@ import org.bukkit.entity.EntityType;
 import com.thekarura.bukkit.plugin.resorcedungeons.ResorceDungeons;
 import com.thekarura.bukkit.plugin.resorcedungeons.manager.buillder.DungeonChest;
 
+/**
+ * Rcanhack構造の基本ダンジョンです。
+ * 多数の変数が混合しあっています。
+ * 
+ * @author karura
+ */
 public class DungeonMossy {
 	
 	public static final Logger log = ResorceDungeons.log;

@@ -20,12 +20,15 @@ public class HelpCommand implements CommandExecutor {
 	// instance
 	private ResorceDungeons instance = ResorceDungeons.getInstance();
 	
-	/**
-	 * コマンド
-	 * 
-	 * getCommand("RDHelp").setExecutor(new HelpCommand());
-	 **/
+	public HelpCommand(ResorceDungeons plugin){
+		this.instance = plugin;
+	}
 	
+	/**
+	 * コマンド(作者、使い方、バージョンを表記)
+	 * 
+	 * @author karura
+	 **/
 	@SuppressWarnings("unused")
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
@@ -77,20 +80,10 @@ public class HelpCommand implements CommandExecutor {
 				sender.sendMessage(msgPrefix + ChatColor.GREEN + "help " + ChatColor.GOLD + args[0] + ChatColor.GREEN + " page");
 				sender.sendMessage(ChatColor.GREEN + "/RDReload");
 				sender.sendMessage(ChatColor.GREEN + "設定をリロードします。");
-				sender.sendMessage(ChatColor.BLUE + "/RDhelp 3");
-				
-				return true;
-				
-			}
-			if (args[0].equals("3")) {
-				
-				log.info(logPrefix + ChatColor.GREEN + "help " + ChatColor.GOLD + args[0] + ChatColor.GREEN + " page");
-				sender.sendMessage(msgPrefix + ChatColor.GREEN + "help " + ChatColor.GOLD + args[0] + ChatColor.GREEN + " page");
-				sender.sendMessage(ChatColor.GREEN + "まだ");
 				sender.sendMessage(ChatColor.BLUE + "/RDhelp");
 				
 				return true;
-				
+					
 			} else{
 				
 				log.info(logPrefix + ChatColor.GREEN + "引数が違います！");

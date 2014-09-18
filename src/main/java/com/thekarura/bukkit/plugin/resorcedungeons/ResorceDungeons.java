@@ -51,10 +51,10 @@ public class ResorceDungeons extends JavaPlugin {
 		pm.registerEvents(blockListener, this);
 		pm.registerEvents(entityListener, this);
 		pm.registerEvents(inventoryListener, this);
-		//pm.registerEvents(chunkListener, this);
+		pm.registerEvents(chunkListener, this);
 		
 		// ** registerCommands **
-		getCommand("RDHelp").setExecutor(new HelpCommand());
+		getCommand("RDHelp").setExecutor(new HelpCommand(this));
 		getCommand("RDGenerate").setExecutor(new GenerateCommand());
 		getCommand("RDReload").setExecutor(new ReloadCommand());
 		

@@ -9,7 +9,6 @@
 package com.thekarura.bukkit.plugin.resorcedungeons.manager;
 
 import java.io.File;
-import java.util.Random;
 import java.util.logging.Logger;
 
 import org.bukkit.Location;
@@ -26,11 +25,9 @@ public class DungeonFloating {
 	
 	//メイン処理
 	
-	@SuppressWarnings("deprecation")
-	public static void createDungeonFloating(Location loc){
+	public void createDungeonFloating(Location loc){
 		
 		Block block = loc.getBlock();
-		Random r = new Random();
 		File test_test_dungeon = new File("plugins/ResorceDungeons/Dungeons/Floating/Village_1.rd");
 		
 		new DungeonBuilder().DungeonGenerator(test_test_dungeon,block,loc);
