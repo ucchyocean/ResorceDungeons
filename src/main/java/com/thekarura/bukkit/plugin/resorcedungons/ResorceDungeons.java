@@ -49,7 +49,7 @@ public class ResorceDungeons extends JavaPlugin {
 		// ** registerEvent **
 		//あまりに重いので心当たりのある処理を停止
 		pm.registerEvents(playerListener, this);
-		//pm.registerEvents(blockListener, this);
+		pm.registerEvents(blockListener, this);
 		pm.registerEvents(entityListener, this);
 		pm.registerEvents(inventoryListener, this);
 		//pm.registerEvents(chunkListener, this);
