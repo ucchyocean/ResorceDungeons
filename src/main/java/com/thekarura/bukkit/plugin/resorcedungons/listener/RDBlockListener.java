@@ -21,27 +21,27 @@ import com.thekarura.bukkit.plugin.resorcedungons.manager.DungeonMossy;
  * @author karura
  */
 public class RDBlockListener implements Listener {
-
+	
 	// ++ Logger ++ //
 	public static final Logger log = ResorceDungeons.log;
 	private static final String logPrefix = ResorceDungeons.logPrefix;
 	private static final String msgPrefix = ResorceDungeons.msgPrefix;
-
+	
 	// ++ Instance ++ //
 	private ResorceDungeons instance = ResorceDungeons.getInstance();
-
+	
 	// ++ Constructor ++ //
 	public RDBlockListener(final ResorceDungeons plugin) {
 		this.instance = plugin;
 	}
-
+	
 	/**
 	 * プレイヤーがサーバーに参加したときに発生するイベント
 	 * @param event
 	 */
 	@EventHandler(ignoreCancelled=true)
 	public void onPlayerJoin(PlayerJoinEvent event) {
-
+		
 		// 参加したプレイヤーに、1秒毎に動作する非同期処理タイマーを仕掛ける。
 		final Player player = event.getPlayer();
 		
@@ -72,43 +72,32 @@ public class RDBlockListener implements Listener {
 				if ( prev != null ) {
 					// 1秒前の位置キャッシュがある場合
 					
+					// 1秒前と完全に同じ位置なら、チェックをしない
+					if ( loc.getBlockX() == prev.getBlockX() &&
+							loc.getBlockY() == prev.getBlockY() && 
+							loc.getBlockZ() == prev.getBlockZ() ) {
+						prev = loc;
+						return;
+					}
+					
+					Location[] minmax = makeMinMaxLocations(loc, prev);
+					Location min = minmax[0];
+					Location max = minmax[1];
+					
 					// x方向に移動した場合、"移動した分のブロックだけ"をチェックする
 					if ( loc.getBlockX() != prev.getBlockX() ) {
-						Location min = (loc.getBlockX() < prev.getBlockX() ) ? loc.clone() : prev.clone();
-						Location max = (loc.getBlockX() < prev.getBlockX() ) ? prev.clone() : loc.clone();
-						
-						// 調査範囲は、min{x, y-50, z-50} から max{x, y+50, z+50}
-						min.add(0, -radius, -radius);
-						max.add(0, radius, radius);
-						
-						// サーチ
-						search(min, max);
+						// min{x, y-50, z-50} から max{x, y+50, z+50} の範囲をサーチ
+						search(min.clone().add(0, -radius, -radius), max.clone().add(0, radius, radius));
 					}
-					
 					// y方向に移動した場合も同様。
 					if ( loc.getBlockY() != prev.getBlockY() ) {
-						Location min = (loc.getBlockY() < prev.getBlockY() ) ? loc.clone() : prev.clone();
-						Location max = (loc.getBlockY() < prev.getBlockY() ) ? prev.clone() : loc.clone();
-						
-						// 調査範囲は、min{x-50, y, z-50} から max{x+50, y, z+50}
-						min.add(-radius, 0, -radius);
-						max.add(radius, 0, radius);
-						
-						// サーチ
-						search(min, max);
+						// min{x-50, y, z-50} から max{x+50, y, z+50} の範囲をサーチ
+						search(min.clone().add(-radius, 0, -radius), max.clone().add(radius, 0, radius));
 					}
-					
 					// z方向に移動した場合も同様。
 					if ( loc.getBlockZ() != prev.getBlockZ() ) {
-						Location min = (loc.getBlockZ() < prev.getBlockZ() ) ? loc.clone() : prev.clone();
-						Location max = (loc.getBlockZ() < prev.getBlockZ() ) ? prev.clone() : loc.clone();
-						
-						// 調査範囲は、min{x-50, y-50, z} から max{x+50, y+50, z}
-						min.add(-radius, -radius, 0);
-						max.add(radius, radius, 0);
-						
-						// サーチ
-						search(min, max);
+						// min{x-50, y-50, z} から max{x+50, y+50, z} の範囲をサーチ
+						search(min.clone().add(-radius, -radius, 0), max.clone().add(radius, radius, 0));
 					}
 					
 				} else {
@@ -123,13 +112,42 @@ public class RDBlockListener implements Listener {
 				prev = loc;
 			}
 			
+			private Location[] makeMinMaxLocations(Location loc1, Location loc2) {
+				
+				int min_x, min_y, min_z, max_x, max_y, max_z;
+				if ( loc1.getBlockX() < loc2.getBlockX() ) {
+					min_x = loc1.getBlockX();
+					max_x = loc2.getBlockX();
+				} else {
+					min_x = loc2.getBlockX();
+					max_x = loc1.getBlockX();
+				}
+				if ( loc1.getBlockY() < loc2.getBlockY() ) {
+					min_y = loc1.getBlockY();
+					max_y = loc2.getBlockY();
+				} else {
+					min_y = loc2.getBlockY();
+					max_y = loc1.getBlockY();
+				}
+				if ( loc1.getBlockZ() < loc2.getBlockZ() ) {
+					min_z = loc1.getBlockZ();
+					max_z = loc2.getBlockZ();
+				} else {
+					min_z = loc2.getBlockZ();
+					max_z = loc1.getBlockZ();
+				}
+				Location min = new Location(loc1.getWorld(), min_x, min_y, min_z);
+				Location max = new Location(loc1.getWorld(), max_x, max_y, max_z);
+				return new Location[]{min, max};
+			}
+			
 			private void search(Location min, Location max) {
 				
 				//ループ処理で特定のブロックを探します
 				World world = min.getWorld();
 				for (int x = min.getBlockX(); x < max.getBlockX(); x++ ){
-					for (int y = min.getBlockY(); y < min.getBlockY(); y++ ){
-						for (int z = min.getBlockZ(); z < min.getBlockZ(); z++ ){
+					for (int y = min.getBlockY(); y < max.getBlockY(); y++ ){
+						for (int z = min.getBlockZ(); z < max.getBlockZ(); z++ ){
 							
 							/* コマンドブロックの上に立っている看板を探します
 							 * 図式
@@ -165,7 +183,7 @@ public class RDBlockListener implements Listener {
 		}.runTaskTimerAsynchronously(ResorceDungeons.getInstance(), 20, 20);
 		// ↑タスクを非同期で、20ticks(1秒)後から、20ticksごとにrunメソッドを実行する
 	}
-
+	
 	/**
 	 * 看板削除用メソッド
 	 * @param w
@@ -178,5 +196,4 @@ public class RDBlockListener implements Listener {
 			w.getBlockAt(i, y + y_, j).setType(Material.AIR);
 		}
 	}
-
 }
