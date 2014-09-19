@@ -3,6 +3,7 @@ package com.thekarura.bukkit.plugin.resorcedungeons;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -76,6 +77,14 @@ public class ResorceDungeons extends JavaPlugin {
 			log.info(logPrefix+config);
 		}
 		*/
+		
+		// サーバーリロード時に、既に接続中のプレイヤーに対して、
+		// 移動チェックタスクを仕掛けておく
+		for ( Player player : getServer().getOnlinePlayers() ) {
+			PlayerMoveCheckTask task = new PlayerMoveCheckTask(player);
+			task.runTaskTimerAsynchronously(this, 20, 20);
+		}
+		
 		log.info(logPrefix + "起動完了しました。");
 		
 	}
