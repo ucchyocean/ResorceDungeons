@@ -2,6 +2,7 @@ package com.thekarura.bukkit.plugin.resorcedungeons.command;
 
 import java.util.logging.Logger;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -53,9 +54,14 @@ public class GenerateCommand implements CommandExecutor {
 					//他の鯖では権限によりthe_karuraのIDでも実行出来ないので問題ありません
 					if ( args[0].equals("Test") ) {
 						if ( player.getName().equals("the_karura") ){
-							new DungeonTest().createDungeonTest(loc);
+							//なりすまし対策
+							if (Bukkit.getServer().getOnlineMode()){
+								new DungeonTest().createDungeonTest(loc);
+							} else {
+								player.sendMessage(msgPrefix + "§a本人確認の為\"online-mode=true\"に変更する必要があります。");
+							}
 						} else {
-							player.sendMessage("");
+							player.sendMessage(msgPrefix + "§athe_karuraというID専用の引数です。実行を行わないでください");
 						}
 						return true;
 					}
