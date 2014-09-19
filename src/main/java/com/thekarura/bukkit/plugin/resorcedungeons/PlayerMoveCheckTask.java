@@ -3,11 +3,11 @@ package com.thekarura.bukkit.plugin.resorcedungeons;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.thekarura.bukkit.plugin.resorcedungeons.ResorceDungeons;
 import com.thekarura.bukkit.plugin.resorcedungeons.manager.DungeonMossy;
 
 /**
@@ -17,7 +17,7 @@ public class PlayerMoveCheckTask extends BukkitRunnable {
 	
 	// パフォーマンスチェック用のデバッグフラグ
 	// trueにすると、コンソールにパフォーマンス情報を出力します
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 	
 	// 感知範囲(コンフィグで調整予定)
 	private static final int radius = 50;
@@ -186,8 +186,7 @@ public class PlayerMoveCheckTask extends BukkitRunnable {
 							//MossyDungeonsを生成します
 							if (sign.getLine(1).equals("Mossy")){
 								
-								remove(world, x, y, z);
-								new DungeonMossy().setDungeonMossy(loc);
+								setMossyDungeon(loc);
 							}
 						}
 					}
@@ -199,15 +198,23 @@ public class PlayerMoveCheckTask extends BukkitRunnable {
 	}
 
 	/**
-	 * 看板削除用メソッド
-	 * @param w
-	 * @param i
-	 * @param y
-	 * @param j
+	 * MossyDungeonを、同期処理で生成します。
+	 * @param loc 生成場所
 	 */
-	private void remove(World w ,int i ,int y ,int j){
-		for (int y_ = 2 ; y_ != -1 ; y_-- ){
-			w.getBlockAt(i, y + y_, j).setType(Material.AIR);
+	private void setMossyDungeon(final Location loc) {
+
+		new BukkitRunnable() {
+
+			@Override
+			public void run() {
+
+				// 看板とコマンドブロックを削除
+				loc.getBlock().getRelative(BlockFace.UP).setType(Material.AIR);
+				loc.getBlock().setType(Material.AIR);
+
+				// ダンジョン生成
+				new DungeonMossy().setDungeonMossy(loc);
 		}
+		}.runTask(ResorceDungeons.getInstance());
 	}
 }
