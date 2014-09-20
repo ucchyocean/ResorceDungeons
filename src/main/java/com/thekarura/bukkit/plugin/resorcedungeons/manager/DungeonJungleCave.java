@@ -44,10 +44,36 @@ public class DungeonJungleCave {
 				//床の処理
 				int flooty = getFloot(loc, chunk, cx, cz);
 				if (flooty == 0){ continue; } //座標0であれば処理をせず次へ渡す
-				int blockid = random.nextInt(2);
-				
 				chunk.getBlock(cx, flooty, cz).setTypeIdAndData(Material.GRASS.getId(),(byte) 0,false);
-				
+				int blockid = random.nextInt(10);
+				//地下に植物を配置します。
+				Material flootm = Material.AIR;
+				byte date = 0;
+				switch(blockid){
+				case 1:
+					flootm = Material.LONG_GRASS;
+					date = 1;
+				break;
+				case 2:
+					flootm = Material.LONG_GRASS;
+					date = 2;
+				break;
+				case 3:
+					flootm = Material.YELLOW_FLOWER;
+				break;
+				case 4:
+					flootm = Material.RED_ROSE;
+				break;
+				case 5:
+					flootm = Material.BROWN_MUSHROOM;
+				break;
+				case 6:
+					flootm = Material.RED_MUSHROOM;
+				break;
+				default:
+				break;
+				}
+				chunk.getBlock(cx, flooty+1, cz).setTypeIdAndData(flootm.getId(), date, false);
 			}
 		}
 		
