@@ -1,35 +1,42 @@
-###################################
-#  Config File
-#  
-#  ver.1000
-###################################
-
-pluginenable: false
-worldname: dungeon
-
-###################################
-# Plugin Settings
-###################################
-
-ENABLE_PLUGIN:
-DUNGEON_GENERATE_WORLD:
-
-###################################
-# Dungeon Generate Trigger
-###################################
-
-ENABLE_DUNGEON_MOSSY:
-ENABLE_DUNGEON_STRONGHORLD:
-ENABLE_DUNGEON_VILLAGE:
-
-###################################
-# Messages
-###################################
-
+ENABLE_PLUGIN: true
+DUNGEON_GENERATE_WORLD: 'dungeon'
+DUNGEON_GENERATE_COMMAND: false
+DUNGEON_GENERATE_TRIGGER_RADIUS: 60
+DUNGEON_GENERATE_UNDERGROUND_HIGTH: 62
+Generate:
+  ENABLE_DUNGEON_MOSSY: true
+  ENABLE_DUNGEON_JUNGLECAVE: true
+  ENABLE_DUNGEON_RUINS: true
+  ENABLE_DUNGEON_TOWERS: true
 message:
-  general:
-    command-generate: ' has generating... '
-    command-generate-error-null: ' You must specify a dungeon name. '
-    command-generate-error-not: ' has not found dungeon. '
-    command-generate-complate: ' has generate '
-    command-generate-complate-2: ' dungeon complate. '
+  help:
+    0:
+      - '&athis Plugin helps.'
+      - '&a******************************'
+      - '&a*     ResorceDungeons'
+      - '&a*     %version%'
+      - '&a*     Auther : %auther%'
+      - '&a******************************'
+      - '/RDhelp 1'
+    1:
+      - '&a/BDGenerate [Dungeon]'
+      - '&aGenerating Dungeon. Allow Generate World %dungeon_world% .'
+      - '&aCan not is Undo!'
+      - '&anext /RDHelp 2'
+    2:
+      - '&a/RDReload [option]'
+      - '&aThis Plugin Reload.'
+      - '&a[option] : disable is plugin stoping. Only console.'
+      - '&anext /RDHelp 3'
+    error_args: '&aNo argment. '
+  reload:
+    no_args: '&aNo argment.'
+    reload: '&aPlugin has reloaded!'
+    disable_console '&aConsole Only argment!'
+  generator:
+    no_args: '&aPlease Dungeon name! /RDGnerate [dungeon_name]'
+    error_args: '&aNo argment.'
+    error_not_exist_dungeon: '&aNot exist Dungeon name!'
+    error_not_dungeonworld: '&aDo not Dungeon Generate World!'
+    test_onlinemode_off: '&aPlease server config is online-mode true!'
+    test_other_player: '&aYou can not generate dungeon!'
