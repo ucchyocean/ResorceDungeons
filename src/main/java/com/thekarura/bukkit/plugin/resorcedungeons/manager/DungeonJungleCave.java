@@ -35,7 +35,8 @@ public class DungeonJungleCave {
 				int topy = getTop(loc ,chunk ,cx ,cz);
 				if (topy == 0){ continue; } //座標0であれば処理をせず次へ渡す
 				for (int y = 0; y < random.nextInt(10-1)+1; y++){
-					if (!chunk.getBlock(cx, topy - y, cz).getType().isSolid()){
+					if (!chunk.getBlock(cx, topy - y, cz).getType().isSolid()
+					&& chunk.getBlock(cx, topy - y, cz).getY() > 10){
 						chunk.getBlock(cx, topy - y, cz).setTypeIdAndData(Material.VINE.getId(), (byte) 15, false);
 					}
 				}
