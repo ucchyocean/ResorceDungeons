@@ -57,7 +57,7 @@ public class ResorceDungeons extends JavaPlugin {
 		// ** registerCommands **
 		getCommand("RDHelp").setExecutor(new HelpCommand(this));
 		getCommand("RDGenerate").setExecutor(new GenerateCommand());
-		getCommand("RDReload").setExecutor(new ReloadCommand());
+		getCommand("RDReload").setExecutor(new ReloadCommand(this));
 		
 		try {
 			

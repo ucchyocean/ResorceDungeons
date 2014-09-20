@@ -3,7 +3,6 @@ package com.thekarura.bukkit.plugin.resorcedungeons.command;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -14,6 +13,7 @@ import com.thekarura.bukkit.plugin.resorcedungeons.ResorceDungeons;
 import com.thekarura.bukkit.plugin.resorcedungeons.manager.DungeonFloating;
 import com.thekarura.bukkit.plugin.resorcedungeons.manager.DungeonMossy;
 import com.thekarura.bukkit.plugin.resorcedungeons.manager.DungeonTest;
+import com.thekarura.bukkit.plugin.resorcedungeons.util.MessageFormats;
 
 public class GenerateCommand implements CommandExecutor {
 	
@@ -27,6 +27,8 @@ public class GenerateCommand implements CommandExecutor {
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
+		
+		MessageFormats format = new MessageFormats(instance);
 		
 		if (!(sender instanceof Player)) {
 			
@@ -42,8 +44,7 @@ public class GenerateCommand implements CommandExecutor {
 			
 			if ( args.length == 0 ) {
 				
-				player.sendMessage(msgPrefix + ChatColor.GREEN + "ダンジョン名を入力してください");
-				player.sendMessage(msgPrefix + ChatColor.GREEN + "/RDGenerate [dungeon]");
+				player.sendMessage(msgPrefix + format.MessageFormat(instance.getConfig().getString("message.generator.no_args"), player.getName()));
 				return true;
 				
 			} else {
@@ -52,16 +53,18 @@ public class GenerateCommand implements CommandExecutor {
 					
 					//確認用であり実用性はないです。(安全の為製作者限定にしています)
 					//他の鯖では権限によりthe_karuraのIDでも実行出来ないので問題ありません
+					//ID変更が可能なoffline-mode環境を封じます
 					if ( args[0].equals("Test") ) {
-						if ( player.getName().equals("the_karura") ){
+						if ( player.getName().equals(instance.getConfigs().getAuther()) ){
 							//なりすまし対策
 							if (Bukkit.getServer().getOnlineMode()){
 								new DungeonTest().createDungeonTest(loc);
 							} else {
-								player.sendMessage(msgPrefix + "§a本人確認の為\"online-mode=true\"に変更する必要があります。");
+								player.sendMessage(msgPrefix + format.MessageFormat(instance.getConfig().getString("message.generator.test_onlinemode_off"), player.getName()));
 							}
+							
 						} else {
-							player.sendMessage(msgPrefix + "§athe_karuraというID専用の引数です。実行を行わないでください");
+							player.sendMessage(msgPrefix + format.MessageFormat(instance.getConfig().getString("message.generator.test_other_player"), player.getName()));
 						}
 						return true;
 					}
@@ -82,13 +85,13 @@ public class GenerateCommand implements CommandExecutor {
 					
 					else {
 						
-						sender.sendMessage(msgPrefix+ChatColor.GREEN+"登録されたダンジョンではありません！");
+						sender.sendMessage(msgPrefix + format.MessageFormat(instance.getConfig().getString("message.generator.error_not_exist_dungeon"), player.getName()));
 						
 					}
 					
 				} else {
 					
-					sender.sendMessage(msgPrefix+ChatColor.GREEN+"ダンジョン生成が可能なワールドではありません！configファイルを確認してください");
+					sender.sendMessage(msgPrefix + format.MessageFormat(instance.getConfig().getString("message.generator.error_not_dungeonworld"), player.getName()));
 					
 				}
 				

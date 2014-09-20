@@ -1,5 +1,6 @@
 package com.thekarura.bukkit.plugin.resorcedungeons.command;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
@@ -9,6 +10,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.thekarura.bukkit.plugin.resorcedungeons.ResorceDungeons;
+import com.thekarura.bukkit.plugin.resorcedungeons.util.MessageFormats;
 
 public class HelpCommand implements CommandExecutor {
 	
@@ -29,16 +31,12 @@ public class HelpCommand implements CommandExecutor {
 	 * 
 	 * @author karura
 	 **/
-	@SuppressWarnings("unused")
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
 		
-		String senderName = ChatColor.stripColor(sender.getName());
+		MessageFormats format = new MessageFormats(instance);
 		
-		//ConfigrationManagerからの読み込み
-		String auther = instance.getConfigs().getAuther();
-		String version = instance.getConfigs().getVersion();
-		String worldname = instance.getConfigs().getDungeonWorld();
+		String senderName = ChatColor.stripColor(sender.getName());
 		
 		if (!(sender instanceof Player)) {
 			
@@ -46,52 +44,46 @@ public class HelpCommand implements CommandExecutor {
 			
 		} else {
 			
-			if (args.length == 0) {
-				
-				log.info(logPrefix + ChatColor.GREEN + "plugin helps.");
-				sender.sendMessage(msgPrefix + ChatColor.GREEN + "plugin helps.");
-				sender.sendMessage(ChatColor.GREEN +"******************************");
-				sender.sendMessage(ChatColor.GREEN +"*     ResorceDungeons");
-				sender.sendMessage(ChatColor.GREEN +"*     " + version);
-				sender.sendMessage(ChatColor.GREEN +"*     Auther :" + auther);
-				sender.sendMessage(ChatColor.GREEN +"******************************");
-				sender.sendMessage(ChatColor.BLUE + "/RDhelp 1");
-				
-				return true;
-				
-			}
-			if (args[0].equals("1")) {
-				
-				log.info(logPrefix + ChatColor.GREEN + "help " + ChatColor.GOLD + args[0] + ChatColor.GREEN + " page");
-				sender.sendMessage(msgPrefix + ChatColor.GREEN + "help " + ChatColor.GOLD + args[0] + ChatColor.GREEN + " page");
-				sender.sendMessage("");
-				sender.sendMessage(ChatColor.GREEN + "/BDGenerate [Dungeon]");
-				sender.sendMessage(ChatColor.GREEN + "ダンジョンを生成します。登録されている[Dungeon]を指定してください。");
-				sender.sendMessage(ChatColor.RED + "※一度生成すると取り消す事は出来ません！");
-				sender.sendMessage(ChatColor.RED + "※\""+worldname+"\"のワールドのみ実行可能です。");
-				sender.sendMessage(ChatColor.BLUE + "/RDhelp 2");
-				
-				return true;
-				
-			} 
-			if (args[0].equals("2")) {
-				
-				log.info(logPrefix + ChatColor.GREEN + "help " + ChatColor.GOLD + args[0] + ChatColor.GREEN + " page");
-				sender.sendMessage(msgPrefix + ChatColor.GREEN + "help " + ChatColor.GOLD + args[0] + ChatColor.GREEN + " page");
-				sender.sendMessage(ChatColor.GREEN + "/RDReload");
-				sender.sendMessage(ChatColor.GREEN + "設定をリロードします。");
-				sender.sendMessage(ChatColor.BLUE + "/RDhelp");
-				
-				return true;
-					
-			} else{
-				
-				log.info(logPrefix + ChatColor.GREEN + "引数が違います！");
-				sender.sendMessage(msgPrefix + ChatColor.GREEN + "引数が違います！");
+			senderName = sender.getName();
 			
-			}
-				
 		}
+		
+		if (args.length == 0) {
+			
+			List<String> help_0 = instance.getConfig().getStringList("message.help.0");
+			for (String help : help_0){
+				sender.sendMessage(msgPrefix + format.MessageFormat(help, senderName));
+			}
+			
+			return true;
+			
+		}
+		if (args[0].equals("1")) {
+			
+			List<String> help_1 = instance.getConfig().getStringList("message.help.1");
+			for (String help : help_1){
+				sender.sendMessage(msgPrefix + format.MessageFormat(help, senderName));
+			}
+			
+			return true;
+			
+		} 
+		if (args[0].equals("2")) {
+			
+			List<String> help_2 = instance.getConfig().getStringList("message.help.2");
+			for (String help : help_2){
+				sender.sendMessage(msgPrefix + format.MessageFormat(help, senderName));
+			}
+			
+			return true;
+				
+		} else{
+			
+			String error = instance.getConfig().getString("message.help.error_args");
+			sender.sendMessage(msgPrefix + format.MessageFormat(error , senderName));
+		
+		}
+		
 	return false;
 		
     }

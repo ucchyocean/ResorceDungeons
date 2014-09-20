@@ -2,13 +2,13 @@ package com.thekarura.bukkit.plugin.resorcedungeons.command;
 
 import java.util.logging.Logger;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.thekarura.bukkit.plugin.resorcedungeons.ResorceDungeons;
+import com.thekarura.bukkit.plugin.resorcedungeons.util.MessageFormats;
 
 /**
  * リロード関連を扱います
@@ -23,12 +23,18 @@ public class ReloadCommand implements CommandExecutor {
 	
 	private ResorceDungeons instance = ResorceDungeons.getInstance();
 	
+	public ReloadCommand(ResorceDungeons plugin){
+		this.instance = plugin;
+	}
+	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		
+		MessageFormats format = new MessageFormats(instance);
+		
 		if (args.length == 0){
 			
-			sender.sendMessage("ReloadもしくはDisableのどちらかを入れてください！");
+			sender.sendMessage(format.MessageFormat(instance.getConfig().getString("message.reload.no_args"), sender.getName()));
 			return false;
 			
 		}
@@ -36,7 +42,7 @@ public class ReloadCommand implements CommandExecutor {
 		if (args[0].equalsIgnoreCase("Reload")){
 			
 			instance.reloadConfig();
-			sender.sendMessage("configファイルをリロードしました。");
+			sender.sendMessage(format.MessageFormat(instance.getConfig().getString("message.reload.reload"), sender.getName()));
 			
 		}
 		
@@ -47,7 +53,7 @@ public class ReloadCommand implements CommandExecutor {
 				instance.getPluginLoader().disablePlugin(instance);
 				return true;
 			} else {
-				sender.sendMessage(msgPrefix+ChatColor.RED+"この引数はコンソール限定です！");
+				sender.sendMessage(format.MessageFormat(instance.getConfig().getString("message.reload.disable_console"), sender.getName()));
 			}
 			
 		}

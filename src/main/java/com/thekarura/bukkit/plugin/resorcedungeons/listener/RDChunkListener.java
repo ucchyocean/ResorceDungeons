@@ -22,7 +22,6 @@ public class RDChunkListener implements Listener {
 	 * 
 	 * @param event
 	 */
-	@SuppressWarnings("deprecation")
 	@EventHandler(ignoreCancelled = true)
 	public void RDChunkPopulateEvent(ChunkPopulateEvent event){
 		
@@ -38,6 +37,8 @@ public class RDChunkListener implements Listener {
 			
 			//ブロックの座標をセット
 			Block block = loc.getBlock();
+			
+			
 			
 			//バイオーム検索をします。
 			switch (loc.getBlock().getBiome()){
