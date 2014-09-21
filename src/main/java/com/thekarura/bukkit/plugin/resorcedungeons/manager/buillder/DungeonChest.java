@@ -60,7 +60,7 @@ public class DungeonChest {
 					//ファイル検出用の処理
 					if ( checkfile == true ){
 						if (str.equalsIgnoreCase("Chest:")){ 
-							log.info(logPrefix+"Chestファイルを検出しました。");
+							log.info(logPrefix+"Chestファイルを検出しました。 :" + chestid + ".rd");
 							
 							checkfile = false;
 						}
@@ -147,7 +147,6 @@ public class DungeonChest {
 										}
 										inv.addItem(item);
 										maxint++;
-										System.out.println("-配置完了");
 									}
 									
 								}

@@ -42,15 +42,20 @@ public class ConfigurationManager {
 	// ** 初期設定 ** //
 	
 	//重要設定項目
-	private boolean ENABLE_PLUGIN =				new Boolean(true);	//pluginを有効化させるかどうか
-	private String DUNGEON_GENERATE_WORLD =		"dungeon";	//ダンジョン自動生成がされるワールド
-	private boolean DUNGEON_GENERATE_COMMAND =	new Boolean(true);	//コマンド実行に上を適応させるか
+	private boolean ENABLE_PLUGIN =					new Boolean(true);	//pluginを有効化させるかどうか
+	private String DUNGEON_GENERATE_WORLD =			"dungeon";	//ダンジョン自動生成がされるワールド
+	private boolean DUNGEON_GENERATE_COMMAND =		new Boolean(true);	//コマンド実行に上を適応させるか
 	
 	//ダンジョン生成
-	private boolean ENABLE_DUNGEON_MOSSY = 		new Boolean(true);	//MossyDungeonの自動生成を許可
-	private boolean ENABLE_DUNGEON_JUNGLECAVE = new Boolean(true);	//JungleCaveの自動生成を許可
-	private boolean ENABLE_DUNGEON_RUINS = 		new Boolean(true);	//Ruinsの自動生成を許可
-	private boolean ENABLE_DUNGEON_TOWERS = 	new Boolean(true);	//Towersの自動生成を許可
+	private boolean ENABLE_DUNGEON_MOSSY =			new Boolean(true);	//MossyDungeonの自動生成を許可
+	private boolean ENABLE_DUNGEON_JUNGLECAVE =		new Boolean(true);	//JungleCaveの自動生成を許可
+	private boolean ENABLE_DUNGEON_RUINS =			new Boolean(true);	//Ruinsの自動生成を許可
+	private boolean ENABLE_DUNGEON_TOWERS =			new Boolean(true);	//Towersの自動生成を許可
+	
+	//生成確立
+	private int DUNGEON_GENERATE_PERCENT_MOSSY =	new Integer(10);		//Mossyの生成確立
+	private int DUNGEON_GENERATE_PERCENT_RUINS =	new Integer(10);		//Ruinsの生成確率
+	private int DUNGEON_GENERATE_PERCENT_TOWERS=	new Integer(10);		//Twoersの生成確立
 	
 	//ダンジョン個別設定
 	//MossyDungeon
@@ -87,18 +92,22 @@ public class ConfigurationManager {
 		
 		plugin.reloadConfig();
 		
+		// == ここからconfig.ymlに書かれた情報を読み取ります。 == //
+		
 		// == 内部的な設定 == //
-		DUNGEON_GENERATE_COMMAND	= plugin.getConfig().getBoolean("DUNGEON_GENERATE_COMMAND");
-		DUNGEON_GENERATE_COMMAND	= plugin.getConfig().getBoolean("DUNGEON_GENERATE_COMMAND");
+		ENABLE_PLUGIN				= plugin.getConfig().getBoolean("ENABLE_PLUGIN", true);
+		DUNGEON_GENERATE_COMMAND	= plugin.getConfig().getBoolean("DUNGEON_GENERATE_COMMAND", true);
 		
 		// == Dungeon生成関連 == //
-		ENABLE_DUNGEON_MOSSY		= plugin.getConfig().getBoolean("Generate.ENABLE_DUNGEON_MOSSY");
-		ENABLE_DUNGEON_JUNGLECAVE	= plugin.getConfig().getBoolean("Generate.ENABLE_DUNGEON_JUNGLECAVE");
-		ENABLE_DUNGEON_RUINS		= plugin.getConfig().getBoolean("Generate.ENABLE_DUNGEON_RUINS");
-		ENABLE_DUNGEON_TOWERS		= plugin.getConfig().getBoolean("Generate.ENABLE_DUNGEON_TOWERS");
+		ENABLE_DUNGEON_MOSSY		= plugin.getConfig().getBoolean("Generate.ENABLE_DUNGEON_MOSSY", true);
+		ENABLE_DUNGEON_JUNGLECAVE	= plugin.getConfig().getBoolean("Generate.ENABLE_DUNGEON_JUNGLECAVE", true);
+		ENABLE_DUNGEON_RUINS		= plugin.getConfig().getBoolean("Generate.ENABLE_DUNGEON_RUINS", true);
+		ENABLE_DUNGEON_TOWERS		= plugin.getConfig().getBoolean("Generate.ENABLE_DUNGEON_TOWERS", true);
 		
-		DUNGEON_GENERATE_TRIGGER_RADIUS		= plugin.getConfig().getInt("DUNGEON_GENERATE_TRIGGER_RADIUS");
-		DUNGEON_GENERATE_UNDERGROUND_HIGTH	= plugin.getConfig().getInt("DUNGEON_GENERATE_UNDERGROUND_HIGTH");
+		DUNGEON_GENERATE_TRIGGER_RADIUS		= plugin.getConfig().getInt("DUNGEON_GENERATE_TRIGGER_RADIUS", 60);
+		DUNGEON_GENERATE_UNDERGROUND_HIGTH	= plugin.getConfig().getInt("DUNGEON_GENERATE_UNDERGROUND_HIGTH", 62);
+		
+		DUNGEON_GENERATE_PERCENT_MOSSY = plugin.getConfig().getInt("DUNGEON_GENERATE_PERCENT_MOSSY", 10);
 		
 		//指定されたワールドがなければ警告します。
 		if (Bukkit.getWorld(DUNGEON_GENERATE_WORLD) == null) {
@@ -126,50 +135,67 @@ public class ConfigurationManager {
 	
 	// ** ゲッター **
 	
+	/** 作者のIDを習得 */
 	public String getAuther(){
 		return this.auther;
 	}
 	
+	/** バージョンの習得 */
 	public String getVersion(){
 		return this.version;
 	}
 	
+	/** pluginの名前を習得 */
 	public String getName(){
 		return this.name;
 	}
 	
+	/** プラグインの階層を習得 */
 	public String getPlugindir(){
 		return this.plugindir;
 	}
 	
+	/** ダンジョンの階層を習得 */
 	public String getDungeondir(){
 		return this.dungeondir;
 	}
 	
+	/** チェストの階層を習得 */
 	public String getChestfile() {
 		return this.CHEST_FILE;
 	}
 	
+	/** モブの階層を習得 */
 	public String getMobsfile() {
 		return this.MOBS_FILE;
 	}
 	
+	/** pluginを実行するかどうかを習得 */
 	public boolean getEnablePlugin(){
 		return this.ENABLE_PLUGIN;
 	}
 	
+	/** ダンジョンワールドを習得 */
 	public String getDungeonWorld(){
 		return this.DUNGEON_GENERATE_WORLD;
 	}
 	
+	/** ダンジョンワールドでの実行をするかどうかを習得 */
 	public boolean getDUNGEON_GENERATE_COMMAND(){
 		return this.DUNGEON_GENERATE_COMMAND;
 	}
 	
+	/** ダンジョンワールドの地下高度を習得します */
+	public int getDUNGEON_GENERATE_UNDERGROUND_HIGTH(){
+		return this.DUNGEON_GENERATE_UNDERGROUND_HIGTH;
+	}
+	
+	/** プレイヤーの有効範囲を習得します */
 	public int getDUNGEON_GENERATE_TRIGGER_RADIUS(){
 		return this.DUNGEON_GENERATE_TRIGGER_RADIUS;
 	}
 	
+	/** MossyDungeonの生成をするかどうかを習得します */
 	public boolean getENABLE_DUNGEON_MOSSY(){
 		return this.ENABLE_DUNGEON_MOSSY;
 	}
@@ -183,6 +209,10 @@ public class ConfigurationManager {
 	}
 	public boolean getENABLE_DUNGEON_TOWERS(){
 		return this.ENABLE_DUNGEON_TOWERS;
+	}
+	
+	public int getDUNGEON_GENERATE_PERCENT_MOSSY(){
+		return this.DUNGEON_GENERATE_PERCENT_MOSSY;
 	}
 	
 }

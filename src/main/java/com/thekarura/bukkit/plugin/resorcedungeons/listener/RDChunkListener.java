@@ -1,7 +1,11 @@
 package com.thekarura.bukkit.plugin.resorcedungeons.listener;
 
+import java.util.Random;
+
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkPopulateEvent;
@@ -32,97 +36,99 @@ public class RDChunkListener implements Listener {
 		//ダンジョンワールドのみ有効化
 		if (event.getWorld().getName().equals(instance.getConfigs().getDungeonWorld())){
 			
+			//ランダムを追加
+			Random random = new Random();
 			//チャンクの0,0,0座標を習得
 			Location loc = event.getChunk().getBlock(0, 0, 0).getLocation();
 			
-			//ブロックの座標をセット
-			Block block = loc.getBlock();
+			//チャンク中央の座標を習得
+			int x = loc.getBlockX() + 8;
+			int z = loc.getBlockZ() + 8;
 			
+			//生成パーセントゲージを追加します
+			int percent = random.nextInt(100);
 			
+			// ++ JungleCaveDungeon ++ //
+			if (instance.getConfigs().getENABLE_DUNGEON_MOSSY()){
+				switch (loc.getBlock().getBiome()){
+				case JUNGLE:
+				case JUNGLE_HILLS:
+					new DungeonJungleCave().setJungleCave(loc);
+				break;
+				default: break;
+				}
+			}
 			
-			//バイオーム検索をします。
-			switch (loc.getBlock().getBiome()){
+			//必須う生成IDを決めます。
+			String plID = "[RDungeons]";	//pluginID
+			String duID = "Dungeon";		//GeneratirID
 			
-			case BEACH:
+			// ++ MossyDungeon ++ //
+			if (percent < instance.getConfigs().getDUNGEON_GENERATE_PERCENT_MOSSY()){
 				
-				break;
-			case DESERT:
-				
-				break;
-			case DESERT_HILLS:
-				
-				break;
-			case EXTREME_HILLS:
-				
-				break;
-			case FOREST:
-				
-				break;
-			case FOREST_HILLS:
-				
-				break;
-			case FROZEN_OCEAN:
-				
-				break;
-			case FROZEN_RIVER:
-				
-				break;
-			case HELL:
-				
-				break;
-			case ICE_MOUNTAINS:
-				
-				break;
-			case ICE_PLAINS:
-				
-				break;
-				
-			// ## ジャングルバイオーム ##
-			case JUNGLE:
-			case JUNGLE_HILLS:
-				
-				//ジャングル地下ダンジョン
-				new DungeonJungleCave().setJungleCave(loc);
-				
-				break;
-			case MUSHROOM_ISLAND:
-				
-				break;
-			case MUSHROOM_SHORE:
-				
-				break;
-			case OCEAN:
-				
-				break;
-			case PLAINS:
-				
-				break;
-			case RIVER:
-				
-				break;
-			case SKY:
-				
-				break;
-			case SMALL_MOUNTAINS:
-				
-				break;
-			case SWAMPLAND:
-				
-				break;
-			case TAIGA:
-				
-				break;
-			case TAIGA_HILLS:
-				
-				break;
-			default:
-				
-				break;
+				//コンフィグから生成が有効か確認
+				if (instance.getConfigs().getENABLE_DUNGEON_MOSSY()){
+					
+					Block block = loc.getBlock();
+					
+					//地下の限界高度を習得
+					int ug_max = instance.getConfigs().getDUNGEON_GENERATE_UNDERGROUND_HIGTH();
+					
+					int y = random.nextInt(ug_max - 5) + 5;
+					
+					if (block.getRelative(x, y, z).getType() == Material.WATER) y = 0;
+					
+					if (y != 0){
+					
+						//ブロックを配置します。
+						block.getRelative(x , y, z).setType(Material.COMMAND);
+						block.getRelative(x , y + 1, z).setType(Material.SIGN_POST);
+						Sign sign = (Sign) block.getRelative(x, y + 1, z).getState();
+						
+						//看板に記入します
+						sign.setLine(0, plID); sign.setLine(1, duID);
+						sign.setLine(2, "Mossy");	//DungeonID
+						sign.update();
+						
+					}
+					
+				}
 				
 			}
+			
+			//バイオームに依存したダンジョン一覧
+			switch (loc.getBlock().getBiome()){
+			case PLAINS:
+			/*
+			// ++ Ruins ++ //
+			if (instance.getConfigs().getENABLE_DUNGEON_RUINS()){
+				
+				
+				
+			}
+			
+			// ++ TowersDungeon ++ //
+			if (instance.getConfigs().getENABLE_DUNGEON_TOWERS()){
+				
+				
+				
+			}
+			*/
+			break;
+			
+			
+			
+			default: break;
+			}
+			
 		}
 	}
 	
+	/**
+	 * 地上の高さを検索します。
+	 * @param loc 探す座標
+	 * @return 地上のy座標を返します
+	 */
 	public int getGround(Location loc){
 		
 		loc = loc.getWorld().getHighestBlockAt(loc).getLocation();

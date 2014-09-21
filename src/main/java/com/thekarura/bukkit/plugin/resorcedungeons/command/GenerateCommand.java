@@ -40,6 +40,8 @@ public class GenerateCommand implements CommandExecutor {
 			//Player情報を習得します
 			Player player = (Player) sender;
 			Location loc = player.getLocation();
+			
+			//埋まり防止の為一段下げます。
 			loc.setY(loc.getY() - 1);
 			
 			if ( args.length == 0 ) {
@@ -49,7 +51,9 @@ public class GenerateCommand implements CommandExecutor {
 				
 			} else {
 				
-				if (player.getWorld().getName().equals(instance.getConfigs().getDungeonWorld())){
+				boolean DUNGEON_GENERATE_COMMAND = instance.getConfigs().getDUNGEON_GENERATE_COMMAND();
+				
+				if (DUNGEON_GENERATE_COMMAND == false || player.getWorld().getName().equals(instance.getConfigs().getDungeonWorld())){
 					
 					//確認用であり実用性はないです。(安全の為製作者限定にしています)
 					//他の鯖では権限によりthe_karuraのIDでも実行出来ないので問題ありません
@@ -70,6 +74,7 @@ public class GenerateCommand implements CommandExecutor {
 					}
 					
 					if ( args[0].equals("Mossy")){
+						
 						new DungeonMossy().setDungeonMossy(loc);
 						return true;
 					}

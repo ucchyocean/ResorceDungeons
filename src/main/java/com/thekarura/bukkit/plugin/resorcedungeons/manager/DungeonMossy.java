@@ -32,6 +32,10 @@ public class DungeonMossy {
 	@SuppressWarnings("deprecation")
 	public void setDungeonMossy(Location loc){
 		
+		//TODO 中央起点にはなるがダンジョン事態が拡張を重ねるのでズレてしまう。修正が必要
+		loc.setX(loc.getX() / 2);
+		loc.setZ(loc.getZ() / 2);
+		
 		// ++ ダンジョン構成 ++
 		Block block = loc.getBlock();
 		//ブロックを指定

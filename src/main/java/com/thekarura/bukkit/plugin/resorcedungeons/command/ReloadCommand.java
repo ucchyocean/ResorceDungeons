@@ -41,8 +41,15 @@ public class ReloadCommand implements CommandExecutor {
 		
 		if (args[0].equalsIgnoreCase("Reload")){
 			
-			instance.reloadConfig();
-			sender.sendMessage(format.MessageFormat(instance.getConfig().getString("message.reload.reload"), sender.getName()));
+			try {
+				
+				instance.getConfigs().load();
+				sender.sendMessage(format.MessageFormat(instance.getConfig().getString("message.reload.reload"), sender.getName()));
+				
+			} catch (Exception e) {
+				
+				e.printStackTrace();
+			}
 			
 		}
 		

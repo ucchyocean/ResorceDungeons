@@ -25,64 +25,69 @@ public class RDEntityListener implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	public void JungleCaveEntityChenge(CreatureSpawnEvent event){
 		
-		//ダンジョンワールドのみ有効化
-		if (event.getLocation().getWorld().getName().equals(instance.getConfigs().getDungeonWorld())){
+		//configにて許可されているかどうか
+		if (instance.getConfigs().getENABLE_DUNGEON_JUNGLECAVE()){
 			
-			//自然湧きのみ固定
-			switch (event.getSpawnReason()){
-			case DEFAULT:
-			case NATURAL:
-			case CHUNK_GEN:
+			//ダンジョンワールドのみ有効化
+			if (event.getLocation().getWorld().getName().equals(instance.getConfigs().getDungeonWorld())){
 				
-				//バイオーム指定
-				switch (event.getLocation().getBlock().getBiome()){
-				
-				//ジャングルバイオーム
-				case JUNGLE:
-				case JUNGLE_HILLS:
+				//自然湧きのみ固定
+				switch (event.getSpawnReason()){
+				case DEFAULT:
+				case NATURAL:
+				case CHUNK_GEN:
 					
-					//EntityType検索
-					switch (event.getEntityType()){
+					//バイオーム指定
+					switch (event.getLocation().getBlock().getBiome()){
 					
-					//毒グモへ置換するモブ
-					case CREEPER:
-					case ENDERMAN:
-					case SLIME:
+					//ジャングルバイオーム
+					case JUNGLE:
+					case JUNGLE_HILLS:
 						
-						event.setCancelled(true);
+						//EntityType検索
+						switch (event.getEntityType()){
 						
-						//群生設定
-						for (int limit = 0; limit < 3 ; limit++){
-							event.getLocation().getWorld().spawnEntity(event.getLocation(), EntityType.CAVE_SPIDER);
+						//毒グモへ置換するモブ
+						case CREEPER:
+						case ENDERMAN:
+						case SLIME:
+							
+							event.setCancelled(true);
+							
+							//群生設定
+							for (int limit = 0; limit < 3 ; limit++){
+								event.getLocation().getWorld().spawnEntity(event.getLocation(), EntityType.CAVE_SPIDER);
+							}
+							
+						break;
+						//ゾンビのレートを蜘蛛に変更
+						case ZOMBIE:
+							
+							event.setCancelled(true);
+							event.getLocation().getWorld().spawnEntity(event.getLocation(), EntityType.SPIDER);
+							
+						break;
+						
+						//動物の湧を一部消します。
+						case COW:
+						case SHEEP:
+						case CHICKEN:
+						case PIG:
+							
+							event.setCancelled(true);
+							
+						default:break;
 						}
 						
 					break;
-					//ゾンビのレートを蜘蛛に変更
-					case ZOMBIE:
-						
-						event.setCancelled(true);
-						event.getLocation().getWorld().spawnEntity(event.getLocation(), EntityType.SPIDER);
-						
-					break;
-					
-					//動物の湧を一部消します。
-					case COW:
-					case SHEEP:
-					case CHICKEN:
-					case PIG:
-						
-						event.setCancelled(true);
-						
 					default:break;
+					
 					}
 					
 				break;
 				default:break;
-				
 				}
 				
-			break;
-			default:break;
 			}
 			
 		}

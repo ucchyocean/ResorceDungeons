@@ -12,6 +12,8 @@ import com.thekarura.bukkit.plugin.resorcedungeons.manager.DungeonMossy;
 
 /**
  * プレイヤーの移動を1秒毎にチェックするタスク処理クラス
+ * @author ucchyocean
+ * thanks for developing! by.the_karura
  */
 public class PlayerMoveCheckTask extends BukkitRunnable {
 	
@@ -183,11 +185,25 @@ public class PlayerMoveCheckTask extends BukkitRunnable {
 						//[RDungeons]と書かれている場合の条件
 						if(sign.getLine(0).equals("[RDungeons]")){
 							
-							//MossyDungeonsを生成します
-							if (sign.getLine(1).equals("Mossy")){
+							//ダンジョンを習得
+							if (sign.getLine(1).equals("Dungeon")){
 								
-								setMossyDungeon(loc);
+								//MossyDungeonsを習得
+								switch (sign.getLine(2)){
+								
+								//MossyDungeon
+								case "Mossy":
+									setMossyDungeon(loc);
+								break;
+								
+								//Ruins
+								case "Ruin":
+									
+								break;
+								
+								}
 							}
+							
 						}
 					}
 				}
