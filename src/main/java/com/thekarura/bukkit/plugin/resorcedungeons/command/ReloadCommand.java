@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import com.thekarura.bukkit.plugin.resorcedungeons.ResorceDungeons;
@@ -31,10 +32,12 @@ public class ReloadCommand implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		
 		MessageFormats format = new MessageFormats(instance);
+		FileConfiguration config = instance.getConfig();
 		
 		if (args.length == 0){
 			
-			sender.sendMessage(format.MessageFormat(instance.getConfig().getString("message.reload.no_args"), sender.getName()));
+			sender.sendMessage(format.MessageFormat(msgPrefix + config.getString(
+					"message.reload.no_args", "&aNo argment."), sender.getName()));
 			return false;
 			
 		}
@@ -44,11 +47,15 @@ public class ReloadCommand implements CommandExecutor {
 			try {
 				
 				instance.getConfigs().load();
-				sender.sendMessage(format.MessageFormat(instance.getConfig().getString("message.reload.reload"), sender.getName()));
+				sender.sendMessage(format.MessageFormat(config.getString(
+						"message.reload.reload", "&aPlugin has reloaded!"), sender.getName()));
 				
 			} catch (Exception e) {
 				
 				e.printStackTrace();
+				e.getMessage();
+				return false;
+				
 			}
 			
 		}
@@ -56,11 +63,14 @@ public class ReloadCommand implements CommandExecutor {
 		if (args[0].equalsIgnoreCase("Disable")){
 			
 			if (!(sender instanceof Player)){
+				
 				log.info(logPrefix+"Plguinを停止しました。Reload時に戻ります。");
 				instance.getPluginLoader().disablePlugin(instance);
 				return true;
+				
 			} else {
-				sender.sendMessage(format.MessageFormat(instance.getConfig().getString("message.reload.disable_console"), sender.getName()));
+				sender.sendMessage(msgPrefix + format.MessageFormat(config.getString(
+						"message.reload.disable_console", "&aConsole Only argment!"), sender.getName()));
 			}
 			
 		}

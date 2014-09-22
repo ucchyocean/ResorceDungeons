@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import com.thekarura.bukkit.plugin.resorcedungeons.ResorceDungeons;
@@ -25,14 +26,16 @@ public class GenerateCommand implements CommandExecutor {
 	// instance
 	private ResorceDungeons instance = ResorceDungeons.getInstance();
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
 		
 		MessageFormats format = new MessageFormats(instance);
+		FileConfiguration config = instance.getConfig();
 		
 		if (!(sender instanceof Player)) {
 			
-			sender.sendMessage(logPrefix + "このコマンドはコンソールでの実行は出来ません");
+			sender.sendMessage(logPrefix + config.getString("&Console dney command!"));
 			return true;
 			
 		} else {
@@ -40,13 +43,14 @@ public class GenerateCommand implements CommandExecutor {
 			//Player情報を習得します
 			Player player = (Player) sender;
 			Location loc = player.getLocation();
+			String name = player.getName();
 			
 			//埋まり防止の為一段下げます。
 			loc.setY(loc.getY() - 1);
 			
 			if ( args.length == 0 ) {
 				
-				player.sendMessage(msgPrefix + format.MessageFormat(instance.getConfig().getString("message.generator.no_args"), player.getName()));
+				player.sendMessage(msgPrefix + format.MessageFormat(config.getString("message.generator.no_args"), name));
 				return true;
 				
 			} else {
@@ -59,16 +63,18 @@ public class GenerateCommand implements CommandExecutor {
 					//他の鯖では権限によりthe_karuraのIDでも実行出来ないので問題ありません
 					//ID変更が可能なoffline-mode環境を封じます
 					if ( args[0].equals("Test") ) {
-						if ( player.getName().equals(instance.getConfigs().getAuther()) ){
+						if ( player == Bukkit.getPlayer(instance.getConfigs().getAuther())){
 							//なりすまし対策
 							if (Bukkit.getServer().getOnlineMode()){
 								new DungeonTest().createDungeonTest(loc);
 							} else {
-								player.sendMessage(msgPrefix + format.MessageFormat(instance.getConfig().getString("message.generator.test_onlinemode_off"), player.getName()));
+								player.sendMessage(msgPrefix + format.MessageFormat(config.getString(
+										"message.generator.test_onlinemode_off", "&aPlease server config is online-mode true!"), name));
 							}
 							
 						} else {
-							player.sendMessage(msgPrefix + format.MessageFormat(instance.getConfig().getString("message.generator.test_other_player"), player.getName()));
+							player.sendMessage(msgPrefix + format.MessageFormat(config.getString(
+									"message.generator.test_other_player", "&aYou can not generate dungeon!"), name));
 						}
 						return true;
 					}
@@ -77,6 +83,12 @@ public class GenerateCommand implements CommandExecutor {
 						
 						new DungeonMossy().setDungeonMossy(loc);
 						return true;
+					}
+					
+					if ( args[0].equals("Ruin") ){
+						
+						
+						
 					}
 					
 					if ( args[0].equals("Tower")){
@@ -90,13 +102,15 @@ public class GenerateCommand implements CommandExecutor {
 					
 					else {
 						
-						sender.sendMessage(msgPrefix + format.MessageFormat(instance.getConfig().getString("message.generator.error_not_exist_dungeon"), player.getName()));
+						sender.sendMessage(msgPrefix + format.MessageFormat(config.getString(
+								"message.generator.error_not_exist_dungeon", "&aNot exist Dungeon name!"), name));
 						
 					}
 					
 				} else {
 					
-					sender.sendMessage(msgPrefix + format.MessageFormat(instance.getConfig().getString("message.generator.error_not_dungeonworld"), player.getName()));
+					sender.sendMessage(msgPrefix + format.MessageFormat(config.getString(
+							"message.generator.error_not_dungeonworld", "&aDo not Dungeon Generate World!"), name));
 					
 				}
 				

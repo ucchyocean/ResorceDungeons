@@ -3,13 +3,14 @@ package com.thekarura.bukkit.plugin.resorcedungeons.listener;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.thekarura.bukkit.plugin.resorcedungeons.ResorceDungeons;
+import com.thekarura.bukkit.plugin.resorcedungeons.util.MessageFormats;
 
 public class RDPlayerListener implements Listener {
 	
@@ -21,24 +22,39 @@ public class RDPlayerListener implements Listener {
 	private ResorceDungeons instance = ResorceDungeons.getInstance();
 	
 	public RDPlayerListener(ResorceDungeons plugin) {
-		this.plugin = plugin;
+		this.instance = plugin;
 	}
 	
-	public ResorceDungeons plugin;
-	
 	/**
-	 * 管理人向けのメッセージを送信
+	 * 自分向けのメッセージを送信
 	 * @param event PlayerJoinEventから習得
 	 */
+	@SuppressWarnings("deprecation")
 	@EventHandler(ignoreCancelled = true)
 	public void onPlayerMoveEvent(PlayerJoinEvent event){
 			
-			String auther = plugin.getConfigs().getAuther();
-			Player player = event.getPlayer();
+			MessageFormats format = new MessageFormats(instance);
 			
-			if (player == Bukkit.getPlayer(auther)){
+			String auther = instance.getConfigs().getAuther();
+			final Player player = event.getPlayer();
+			
+			final String server_name = instance.getServer().getServerName();
+			final String plugin_name = instance.getConfigs().getName();
+			
+			final String mes = format.MessageFormat("&a" + server_name + " は " + plugin_name + "を導入しています。", player.getName());
+			
+			if (player == Bukkit.getPlayer(instance.getConfigs().getAuther())){
 				
-				player.sendMessage(msgPrefix+ChatColor.GREEN+Bukkit.getServerName()+"はResorceDungeonsを導入しています。");
+				new BukkitRunnable(){
+					
+					@Override
+					public void run(){
+						
+						player.sendMessage(msgPrefix + mes);
+						
+					}
+					
+				}.runTaskLater(instance, 60);
 				
 			}
 		

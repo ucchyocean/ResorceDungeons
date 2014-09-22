@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.logging.Logger;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Chest;
@@ -19,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.thekarura.bukkit.plugin.resorcedungeons.ResorceDungeons;
+import com.thekarura.bukkit.plugin.resorcedungeons.util.MessageFormats;
 
 public class DungeonChest {
 	
@@ -26,7 +26,7 @@ public class DungeonChest {
 	private static final String logPrefix = ResorceDungeons.logPrefix;
 	private static final String msgPrefix = ResorceDungeons.msgPrefix;
 	
-	private static ResorceDungeons instance = ResorceDungeons.getInstance();
+	private ResorceDungeons instance = ResorceDungeons.getInstance();
 	
 	private int strint = 1;
 	
@@ -60,7 +60,7 @@ public class DungeonChest {
 					//ファイル検出用の処理
 					if ( checkfile == true ){
 						if (str.equalsIgnoreCase("Chest:")){ 
-							log.info(logPrefix+"Chestファイルを検出しました。 :" + chestid + ".rd");
+							log.info(logPrefix+"Detection is Chest file! :" + chestid + ".rd");
 							
 							checkfile = false;
 						}
@@ -166,7 +166,7 @@ public class DungeonChest {
 			} else {
 				br.close();
 				//ファイル読み込みに失敗した場合
-				log.info(logPrefix + "§4 Error : FileNotFound. (ファイルが存在しません)");
+				log.info(logPrefix + "§4 Error : FileNotFound.");
 				return;
 			}
 			
@@ -201,7 +201,8 @@ public class DungeonChest {
 	 * @return
 	 */
 	private String ColorFormat(String mes){
-		return ChatColor.translateAlternateColorCodes('&', mes);
+		MessageFormats format = new MessageFormats(instance);
+		return format.MessageFormat(mes, null);
 	}
 	
 	public boolean checkfile(File file){

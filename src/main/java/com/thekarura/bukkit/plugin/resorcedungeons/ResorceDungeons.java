@@ -13,8 +13,8 @@ import com.thekarura.bukkit.plugin.resorcedungeons.command.ReloadCommand;
 import com.thekarura.bukkit.plugin.resorcedungeons.listener.RDBlockListener;
 import com.thekarura.bukkit.plugin.resorcedungeons.listener.RDChunkListener;
 import com.thekarura.bukkit.plugin.resorcedungeons.listener.RDEntityListener;
-import com.thekarura.bukkit.plugin.resorcedungeons.listener.RDInventoryListener;
 import com.thekarura.bukkit.plugin.resorcedungeons.listener.RDPlayerListener;
+import com.thekarura.bukkit.plugin.resorcedungeons.listener.RDSignListener;
 
 public class ResorceDungeons extends JavaPlugin {
 	
@@ -27,8 +27,8 @@ public class ResorceDungeons extends JavaPlugin {
 	private final RDPlayerListener playerListener = new RDPlayerListener(this);
 	private final RDBlockListener blockListener = new RDBlockListener(this);
 	private final RDEntityListener entityListener = new RDEntityListener(this);
-	private final RDInventoryListener inventoryListener = new RDInventoryListener(this);
 	private final RDChunkListener chunkListener = new RDChunkListener(this);
+	private final RDSignListener signListener = new RDSignListener(this);
 	
 	// ** Private classes **
 	private ConfigurationManager config;
@@ -51,8 +51,8 @@ public class ResorceDungeons extends JavaPlugin {
 		pm.registerEvents(playerListener, this);
 		pm.registerEvents(blockListener, this);
 		pm.registerEvents(entityListener, this);
-		pm.registerEvents(inventoryListener, this);
 		pm.registerEvents(chunkListener, this);
+		pm.registerEvents(signListener, this);
 		
 		// ** registerCommands **
 		getCommand("RDHelp").setExecutor(new HelpCommand(this));
@@ -71,12 +71,11 @@ public class ResorceDungeons extends JavaPlugin {
 			
 		}
 		
-		/* TODO まだ実装しないでおこう
+		//pluginの起動前に確認をします
 		if(config.getEnablePlugin() == false){
 			pm.disablePlugins();
-			log.info(logPrefix+config);
+			log.info(logPrefix + config.getName() + " is Disabled! if plugin enable ENABLE_PLUGIN if true.");
 		}
-		*/
 		
 		// サーバーリロード時に、既に接続中のプレイヤーに対して、
 		// 移動チェックタスクを仕掛けておく

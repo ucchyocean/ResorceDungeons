@@ -7,6 +7,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import com.thekarura.bukkit.plugin.resorcedungeons.ResorceDungeons;
@@ -35,24 +36,39 @@ public class HelpCommand implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
 		
 		MessageFormats format = new MessageFormats(instance);
-		
-		String senderName = ChatColor.stripColor(sender.getName());
+		String name = ChatColor.stripColor(sender.getName());
+		FileConfiguration config = instance.getConfig();
 		
 		if (!(sender instanceof Player)) {
 			
-			senderName = "Console";
+			name = "Console";
 			
 		} else {
 			
-			senderName = sender.getName();
+			name = sender.getName();
 			
 		}
 		
 		if (args.length == 0) {
 			
-			List<String> help_0 = instance.getConfig().getStringList("message.help.0");
-			for (String help : help_0){
-				sender.sendMessage(msgPrefix + format.MessageFormat(help, senderName));
+			if (!config.getString("message.help.0").equals(null)){
+				
+				List<String> help_0 = config.getStringList("message.help.0");
+				for (String help : help_0){
+					sender.sendMessage(msgPrefix + format.MessageFormat(help, name));
+				}
+				
+			} else {
+				
+				sender.sendMessage(msgPrefix + format.MessageFormat("&athis Plugin helps", name));
+				sender.sendMessage(msgPrefix + format.MessageFormat("&a******************************", name));
+				sender.sendMessage(msgPrefix + format.MessageFormat("&a*     ResorceDungeons", name));
+				sender.sendMessage(msgPrefix + format.MessageFormat("&a*     %version%'", name));
+				sender.sendMessage(msgPrefix + format.MessageFormat("&a*     Auther : %auther%", name));
+				sender.sendMessage(msgPrefix + format.MessageFormat("&a******************************", name));
+				sender.sendMessage(msgPrefix + format.MessageFormat("/RDhelp 1", name));
+				
+				
 			}
 			
 			return true;
@@ -60,9 +76,20 @@ public class HelpCommand implements CommandExecutor {
 		}
 		if (args[0].equals("1")) {
 			
-			List<String> help_1 = instance.getConfig().getStringList("message.help.1");
-			for (String help : help_1){
-				sender.sendMessage(msgPrefix + format.MessageFormat(help, senderName));
+			if (!config.getString("message.help.1").equals(null)){
+				
+				List<String> help_1 = config.getStringList("message.help.1");
+				for (String help : help_1){
+					sender.sendMessage(msgPrefix + format.MessageFormat(help, name));
+				}
+				
+			} else {
+				
+				sender.sendMessage(msgPrefix + format.MessageFormat("&a/BDGenerate [Dungeon]", name));
+				sender.sendMessage(msgPrefix + format.MessageFormat("&aGenerating Dungeon. Allow Generate World %dungeon_world% .", name));
+				sender.sendMessage(msgPrefix + format.MessageFormat("&aCan not is Undo!", name));
+				sender.sendMessage(msgPrefix + format.MessageFormat("&anext /RDHelp 2", name));
+				
 			}
 			
 			return true;
@@ -70,17 +97,29 @@ public class HelpCommand implements CommandExecutor {
 		} 
 		if (args[0].equals("2")) {
 			
-			List<String> help_2 = instance.getConfig().getStringList("message.help.2");
-			for (String help : help_2){
-				sender.sendMessage(msgPrefix + format.MessageFormat(help, senderName));
+			if (!config.getString("message.help.2").equals(null)){
+				
+				List<String> help_2 = config.getStringList("message.help.2");
+				for (String help : help_2){
+					sender.sendMessage(msgPrefix + format.MessageFormat(help, name));
+				}
+				
+			} else {
+				
+				sender.sendMessage(msgPrefix + format.MessageFormat("&a/RDReload [option]", name));
+				sender.sendMessage(msgPrefix + format.MessageFormat("&aThis Plugin Reload.", name));
+				sender.sendMessage(msgPrefix + format.MessageFormat("&a[option] : disable is plugin stoping. Only console.", name));
+				sender.sendMessage(msgPrefix + format.MessageFormat("&anext /RDHelp 3", name));
+				
+				
 			}
 			
 			return true;
 				
 		} else{
 			
-			String error = instance.getConfig().getString("message.help.error_args");
-			sender.sendMessage(msgPrefix + format.MessageFormat(error , senderName));
+			String error = config.getString("message.help.error_args", "&aNo argment.");
+			sender.sendMessage(msgPrefix + format.MessageFormat(error , name));
 		
 		}
 		

@@ -3,6 +3,7 @@ main: com.thekarura.bukkit.plugin.resorcedungeons.ResorceDungeons
 version: 1.0.0
 author: the_karura
 description: It is a plugin that generates the Dungeons.
+load:  POSTWORLD
 commands:
    RDHelp:
       description: plugin helps.

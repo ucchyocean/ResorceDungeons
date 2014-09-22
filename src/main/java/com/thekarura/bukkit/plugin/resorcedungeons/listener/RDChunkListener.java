@@ -6,10 +6,12 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkPopulateEvent;
 
+import com.thekarura.bukkit.plugin.resorcedungeons.ConfigurationManager;
 import com.thekarura.bukkit.plugin.resorcedungeons.ResorceDungeons;
 import com.thekarura.bukkit.plugin.resorcedungeons.manager.DungeonJungleCave;
 
@@ -17,14 +19,24 @@ public class RDChunkListener implements Listener {
 	
 	private ResorceDungeons instance = ResorceDungeons.getInstance();
 	
+	public Random random = new Random();
+	public int percent = random.nextInt(100);
+	
+	//生成IDを指定します。
+	public String plID = "[RDungeons]";	//pluginID
+	public String duID = "Dungeon";		//dungeonID
+	
 	public RDChunkListener(ResorceDungeons resorcedungeons){
 		this.instance = resorcedungeons;
 	}
 	
+	public FileConfiguration config = instance.getConfig();
+	public ConfigurationManager config_ = instance.getConfigs();
+	
 	/**
 	 * チャンク生成時に確立によりダンジョンジェネレーターが配置されるかどうか
 	 * 
-	 * @param event
+	 * @param event ChunkPopulateEvent チャンク生成イベント
 	 */
 	@EventHandler(ignoreCancelled = true)
 	public void RDChunkPopulateEvent(ChunkPopulateEvent event){
@@ -34,22 +46,13 @@ public class RDChunkListener implements Listener {
 		 */
 		
 		//ダンジョンワールドのみ有効化
-		if (event.getWorld().getName().equals(instance.getConfigs().getDungeonWorld())){
+		if (event.getWorld().getName().equals(config_.getDungeonWorld())){
 			
-			//ランダムを追加
-			Random random = new Random();
 			//チャンクの0,0,0座標を習得
 			Location loc = event.getChunk().getBlock(0, 0, 0).getLocation();
 			
-			//チャンク中央の座標を習得
-			int x = loc.getBlockX() + 8;
-			int z = loc.getBlockZ() + 8;
-			
-			//生成パーセントゲージを追加します
-			int percent = random.nextInt(100);
-			
 			// ++ JungleCaveDungeon ++ //
-			if (instance.getConfigs().getENABLE_DUNGEON_MOSSY()){
+			if (config_.getENABLE_DUNGEON_JUNGLECAVE()){
 				switch (loc.getBlock().getBiome()){
 				case JUNGLE:
 				case JUNGLE_HILLS:
@@ -59,61 +62,27 @@ public class RDChunkListener implements Listener {
 				}
 			}
 			
-			//必須う生成IDを決めます。
-			String plID = "[RDungeons]";	//pluginID
-			String duID = "Dungeon";		//GeneratirID
-			
 			// ++ MossyDungeon ++ //
-			if (percent < instance.getConfigs().getDUNGEON_GENERATE_PERCENT_MOSSY()){
-				
-				//コンフィグから生成が有効か確認
-				if (instance.getConfigs().getENABLE_DUNGEON_MOSSY()){
-					
-					Block block = loc.getBlock();
-					
-					//地下の限界高度を習得
-					int ug_max = instance.getConfigs().getDUNGEON_GENERATE_UNDERGROUND_HIGTH();
-					
-					int y = random.nextInt(ug_max - 5) + 5;
-					
-					if (block.getRelative(x, y, z).getType() == Material.WATER) y = 0;
-					
-					if (y != 0){
-					
-						//ブロックを配置します。
-						block.getRelative(x , y, z).setType(Material.COMMAND);
-						block.getRelative(x , y + 1, z).setType(Material.SIGN_POST);
-						Sign sign = (Sign) block.getRelative(x, y + 1, z).getState();
-						
-						//看板に記入します
-						sign.setLine(0, plID); sign.setLine(1, duID);
-						sign.setLine(2, "Mossy");	//DungeonID
-						sign.update();
-						
-					}
-					
-				}
-				
-			}
+			dungeonMossy(loc);
 			
 			//バイオームに依存したダンジョン一覧
 			switch (loc.getBlock().getBiome()){
 			case PLAINS:
-			/*
-			// ++ Ruins ++ //
-			if (instance.getConfigs().getENABLE_DUNGEON_RUINS()){
+					
+				// ++ Ruins ++ //
+				if (config_.getENABLE_DUNGEON_RUINS()){
+					
+					
+					
+				}
 				
+				// ++ TowersDungeon ++ //
+				if (config_.getENABLE_DUNGEON_TOWERS()){
+					
+					
+					
+				}
 				
-				
-			}
-			
-			// ++ TowersDungeon ++ //
-			if (instance.getConfigs().getENABLE_DUNGEON_TOWERS()){
-				
-				
-				
-			}
-			*/
 			break;
 			
 			
@@ -148,6 +117,51 @@ public class RDChunkListener implements Listener {
 		}
 		
 		return ground;
+	}
+	
+	/**
+	 * MossyDungeonの生成条件
+	 * @param loc 座標
+	 */
+	private void dungeonMossy(Location loc){
+		
+		//コンフィグから生成が有効か確認
+		if (config_.getENABLE_DUNGEON_MOSSY()){
+			
+			if (percent < config_.getDUNGEON_GENERATE_PERCENT_MOSSY()){
+				
+				//チャンク中央の座標を習得
+				int x = loc.getBlockX() + 8;
+				int z = loc.getBlockZ() + 8;
+				
+				Block block = loc.getBlock();
+				
+				//地下の限界高度を習得
+				int ug_max = config_.getDUNGEON_GENERATE_UNDERGROUND_HIGTH();
+				
+				int y = random.nextInt(ug_max - 5) + 5;
+				
+				if (block.getRelative(x, y, z).getType() == Material.STONE
+				&& block.getRelative(x, y + 4, z).getType() == Material.STONE) y = 0;
+				
+				if (y != 0){
+				
+					//ブロックを配置します。
+					block.getRelative(x , y, z).setType(Material.COMMAND);
+					block.getRelative(x , y + 1, z).setType(Material.SIGN_POST);
+					Sign sign = (Sign) block.getRelative(x, y + 1, z).getState();
+					
+					//看板に記入します
+					sign.setLine(0, plID); sign.setLine(1, duID);
+					sign.setLine(2, "Mossy");	//DungeonID
+					sign.update();
+					
+				}
+				
+			}
+			
+		}
+		
 	}
 	
 }

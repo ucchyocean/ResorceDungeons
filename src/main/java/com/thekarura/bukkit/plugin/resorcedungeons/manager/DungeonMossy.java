@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.logging.Logger;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -31,10 +29,6 @@ public class DungeonMossy {
 	
 	@SuppressWarnings("deprecation")
 	public void setDungeonMossy(Location loc){
-		
-		//TODO 中央起点にはなるがダンジョン事態が拡張を重ねるのでズレてしまう。修正が必要
-		loc.setX(loc.getX() / 2);
-		loc.setZ(loc.getZ() / 2);
 		
 		// ++ ダンジョン構成 ++
 		Block block = loc.getBlock();
@@ -283,8 +277,7 @@ public class DungeonMossy {
 			
 		}
 		
-		log.info(logPrefix + " ダンジョンを生成しました。");
-		Bukkit.broadcastMessage(msgPrefix + ChatColor.BLUE + ChatColor.GREEN + " ダンジョンを生成しました。");
+		log.info(logPrefix + " created the mossy dungeon!" + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ());
 		
 		return;
 		
