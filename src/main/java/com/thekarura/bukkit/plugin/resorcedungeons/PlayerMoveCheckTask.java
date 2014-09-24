@@ -1,5 +1,7 @@
 package com.thekarura.bukkit.plugin.resorcedungeons;
 
+import java.util.ArrayList;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -66,9 +68,10 @@ public class PlayerMoveCheckTask extends BukkitRunnable {
 			return;
 		}
 		
+		ArrayList<Location> dungeonLocs = new ArrayList<Location>();
 		Location loc = player.getLocation();
 		int count = 0;
-		if ( prev != null && prev.distanceSquared(loc) > radius * radius ) {
+		if ( prev != null && prev.distanceSquared(loc) < radius * radius ) {
 			// 1秒前の位置キャッシュがあり、移動距離がradiusの範囲内である（テレポートしていない）場合
 			
 			// 1秒前と完全に同じ位置なら、チェックをしない
@@ -85,26 +88,40 @@ public class PlayerMoveCheckTask extends BukkitRunnable {
 			
 			// x方向に移動した場合、"移動した分のブロックだけ"をチェックする
 			if ( loc.getBlockX() != prev.getBlockX() ) {
-				// min{x, y-50, z-50} から max{x, y+50, z+50} の範囲をサーチ
-				count += search(min.clone().add(0, -radius, -radius), max.clone().add(0, radius, radius));
+				// min{x, y-radius, z-radius} から max{x, y+radius, z+radius} の範囲をサーチ
+				count += search(
+						min.clone().add(0, -radius, -radius),
+						max.clone().add(0, radius, radius),
+						dungeonLocs);
 			}
 			// y方向に移動した場合も同様。
 			if ( loc.getBlockY() != prev.getBlockY() ) {
-				// min{x-50, y, z-50} から max{x+50, y, z+50} の範囲をサーチ
-				count += search(min.clone().add(-radius, 0, -radius), max.clone().add(radius, 0, radius));
+				// min{x-radius, y, z-radius} から max{x+radius, y, z+radius} の範囲をサーチ
+				count += search(
+						min.clone().add(-radius, 0, -radius),
+						max.clone().add(radius, 0, radius),
+						dungeonLocs);
 			}
 			// z方向に移動した場合も同様。
 			if ( loc.getBlockZ() != prev.getBlockZ() ) {
-				// min{x-50, y-50, z} から max{x+50, y+50, z} の範囲をサーチ
-				count += search(min.clone().add(-radius, -radius, 0), max.clone().add(radius, radius, 0));
+				// min{x-radius, y-radius, z} から max{x+radius, y+radius, z} の範囲をサーチ
+				count += search(
+						min.clone().add(-radius, -radius, 0),
+						max.clone().add(radius, radius, 0),
+						dungeonLocs);
 			}
 			
 		} else {
 			// 1秒前の位置キャッシュが無い場合、しかたがないので全範囲をサーチする
 			Location min = loc.clone().add(-radius, -radius, -radius);
 			Location max = loc.clone().add(radius, radius, radius);
-			count += search(min, max);
+			count += search(min, max, dungeonLocs);
 			
+		}
+		
+		// ダンジョン生成位置が見つかった場合、ダンジョンを生成する
+		if ( dungeonLocs.size() >= 1 ) {
+			setDungeons(dungeonLocs);
 		}
 		
 		// 今回のサーチした位置を保存しておく
@@ -159,9 +176,10 @@ public class PlayerMoveCheckTask extends BukkitRunnable {
 	 * 対象物が見つかったら削除して、ダンジョンを生成します。
 	 * @param min サーチ開始位置
 	 * @param max サーチ終了位置
+	 * @param dungeonLocs 見つかったダンジョン生成位置を返すための配列
 	 * @return サーチしたブロックの個数
 	 */
-	private int search(Location min, Location max) {
+	private int search(Location min, Location max, ArrayList<Location> dungeonLocs) {
 		
 		//ループ処理で特定のブロックを探します
 		World world = min.getWorld();
@@ -190,25 +208,12 @@ public class PlayerMoveCheckTask extends BukkitRunnable {
 						//[RDungeons]と書かれている場合の条件
 						if(sign.getLine(0).equals("[RDungeons]")){
 							
-							//ダンジョンを習得
+							//ダンジョン生成の指示であることを確認
 							if (sign.getLine(1).equals("Dungeon")){
 								
-								// ダンジョンIDを検索
-								switch (sign.getLine(2)){
-								
-								//MossyDungeon
-								case "Mossy":
-									setMossyDungeon(loc);
-								break;
-								
-								//Ruins
-								case "Ruin":
-									setRuinDungeon(loc);
-								break;
-								
-								}
+								// 生成位置を保存する
+								dungeonLocs.add(loc);
 							}
-							
 						}
 					}
 				}
@@ -216,47 +221,75 @@ public class PlayerMoveCheckTask extends BukkitRunnable {
 		}
 		
 		return count;
-		
 	}
 
 	/**
-	 * MossyDungeonを、同期処理で生成します。
+	 * ダンジョンを同期処理で生成します。
+	 * @param locations
+	 */
+	private void setDungeons(final ArrayList<Location> locations) {
+		
+		new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				
+				for ( Location loc : locations ) {
+					
+					// 既にダンジョン生成済みになっている可能性があるので、
+					// ブロックを再チェックする
+					if(loc.getBlock().getType() == Material.COMMAND
+					&& loc.getBlock().getRelative(BlockFace.UP).getType() == Material.SIGN_POST){
+						
+						// 看板のBlockStateを取得する
+						Sign sign = (Sign)loc.getBlock().getRelative(BlockFace.UP).getState();
+						
+						// ダンジョンIDを検索
+						switch (sign.getLine(2)){
+						
+						//MossyDungeon
+						case "Mossy":
+							setMossyDungeon(loc);
+						break;
+						
+						//Ruins
+						case "Ruin":
+							setRuinDungeon(loc);
+						break;
+						
+						}
+					}
+				}
+			}
+		}.runTask(instance);
+	}
+	
+	/**
+	 * MossyDungeonを生成します。
 	 * @param loc 生成場所
 	 */
-	private void setMossyDungeon(final Location loc) {
+	private void setMossyDungeon(Location loc) {
 		
-		new BukkitRunnable() {
-			
-			@Override
-			public void run() {
-				
-				// 看板とコマンドブロックを削除
-				loc.getBlock().getRelative(BlockFace.UP).setType(Material.AIR);
-				loc.getBlock().setType(Material.AIR);
-				
-				// ダンジョン生成
-				new DungeonMossy(instance).setDungeonMossy(loc);
-			}
-			
-		}.runTask(instance);
+		// 看板とコマンドブロックを削除
+		loc.getBlock().getRelative(BlockFace.UP).setType(Material.AIR);
+		loc.getBlock().setType(Material.AIR);
+		
+		// ダンジョン生成
+		new DungeonMossy(instance).setDungeonMossy(loc);
 	}
 	
-	private void setRuinDungeon(final Location loc) {
+	/**
+	 * RuinDungeonを生成します。
+	 * @param loc 生成場所
+	 */
+	private void setRuinDungeon(Location loc) {
 		
-		new BukkitRunnable() {
-			
-			@Override
-			public void run() {
-				
-				loc.getBlock().getRelative(BlockFace.UP).setType(Material.AIR);
-				loc.getBlock().setType(Material.AIR);
-				
-				// ダンジョン生成
-				new DungeonRuins(instance).setDungeonRuins(loc);
-			}
-			
-		}.runTask(instance);
+		// 看板とコマンドブロックを削除
+		loc.getBlock().getRelative(BlockFace.UP).setType(Material.AIR);
+		loc.getBlock().setType(Material.AIR);
 		
+		// ダンジョン生成
+		new DungeonRuins(instance).setDungeonRuins(loc);
 	}
-	
+
 }
