@@ -22,7 +22,7 @@ public class PlayerMoveCheckTask extends BukkitRunnable {
 	// trueにすると、コンソールにパフォーマンス情報を出力します
 	private static final boolean DEBUG = false;
 	
-	// 感知範囲(コンフィグで調整予定)
+	// 感知範囲
 	private int radius;
 	
 	// 追跡対象のプレイヤー
@@ -68,8 +68,8 @@ public class PlayerMoveCheckTask extends BukkitRunnable {
 		
 		Location loc = player.getLocation();
 		int count = 0;
-		if ( prev != null ) {
-			// 1秒前の位置キャッシュがある場合
+		if ( prev != null && prev.distanceSquared(loc) > radius * radius ) {
+			// 1秒前の位置キャッシュがあり、移動距離がradiusの範囲内である（テレポートしていない）場合
 			
 			// 1秒前と完全に同じ位置なら、チェックをしない
 			if ( loc.getBlockX() == prev.getBlockX() &&
