@@ -33,12 +33,17 @@ public class DungeonBuilder {
 	private ResorceDungeons instance = ResorceDungeons.getInstance();
 	
 	@SuppressWarnings("deprecation")
-	public void DungeonGenerator(File file,Block block,Location loc){
+	public void DungeonGenerator(String filename, Location loc){
 		
 		try {
 			
+			String dungeonsdir = instance.getConfigs().getDungeondir();
+			
+			File file = new File(dungeonsdir+filename+".rd");
 			BufferedReader br = new BufferedReader(new FileReader(file));
 			Random r = new Random();
+			
+			Block block = loc.getBlock();
 			
 			if (checkfile(file)) {
 				
@@ -118,24 +123,21 @@ public class DungeonBuilder {
 							}
 							//MobSpawnerを配置します。
 							if (str.equalsIgnoreCase("-MobSpawner")){
-								CreatureSpawner spawner = (CreatureSpawner) block.getState();
+								block.getRelative(load_posx, load_posy, load_posz).
+								setTypeIdAndData(Material.MOB_SPAWNER.getId(),(byte) 0, load_Physics);
+								CreatureSpawner spawner = (CreatureSpawner) block.getRelative(load_posx, load_posy, load_posz).getState();
 								str = br.readLine(); strint++;
 								spawner.setSpawnedType(EntityType.valueOf(str));
 								if (errorCheck(str, br, strint)){errorMessage(1,"-[パラメーター]"); return;}
-								block.getRelative(load_posx, load_posy, load_posz).
-								setTypeIdAndData(Material.MOB_SPAWNER.getId(),(byte) 0, load_Physics);
 							}
 							//チェストの配置をします。
 							if (str.equalsIgnoreCase("-Chest")) {
 								str = br.readLine(); strint++;
 								block.getRelative(load_posx, load_posy, load_posz).
 								setTypeIdAndData(Material.CHEST.getId(),(byte) 0, load_Physics);
-								new DungeonChest().setChest(str, loc);
+								new DungeonChest().setChest(str, block.getRelative(load_posx, load_posy, load_posz));
 							}
-							//鉱石をランダムで配置します。
-							if (str.equalsIgnoreCase("-Ore")) {
-								setOre(str,br,r);
-							}
+							
 						}
 						
 					}
@@ -150,7 +152,7 @@ public class DungeonBuilder {
 				br.close();
 				//ファイル読み込みに失敗した場合
 				log.info(logPrefix + "§4 Error : FileNotFound. (ファイルが存在しません)");
-				Bukkit.broadcastMessage(msgPrefix + "§4 Error : FileNotFound");
+				Bukkit.broadcastMessage(msgPrefix + "§4 Error : FileNotFound. " + file + ".rd");
 				return;
 			}
 			
@@ -160,7 +162,9 @@ public class DungeonBuilder {
 			System.out.println(e);
 		}
 		
-		Bukkit.broadcastMessage(msgPrefix + ChatColor.BLUE + ChatColor.GREEN + " ダンジョンを生成しました。");
+		String mes = instance.getConfig().getString("message.generate", "Dungeon generated is :");
+		
+		log.info(logPrefix + mes + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ());
 		
 	}
 	
@@ -204,22 +208,13 @@ public class DungeonBuilder {
 		
 	}
 	
-	public boolean checkfile(File file){
+	private boolean checkfile(File file){
 		if (file.exists()){
 			if (file.isFile() && file.canRead()){
 			return true;
 			}
 		}
 	return false;
-	}
-	
-	private void setOre(String str ,BufferedReader br ,Random r) throws IOException{
-		int loop=0;
-		while(str.equalsIgnoreCase("")||(loop == 100)){
-			str = br.readLine();
-			Material m = Material.getMaterial(str);
-			loop++;
-		}
 	}
 	
 }

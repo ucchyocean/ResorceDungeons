@@ -42,7 +42,10 @@ public class RDEntityListener implements Listener {
 					
 					//ジャングルバイオーム
 					case JUNGLE:
+					case JUNGLE_EDGE:
+					case JUNGLE_EDGE_MOUNTAINS:
 					case JUNGLE_HILLS:
+					case JUNGLE_MOUNTAINS:
 						
 						//EntityType検索
 						switch (event.getEntityType()){

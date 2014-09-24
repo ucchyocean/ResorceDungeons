@@ -72,7 +72,7 @@ public class ResorceDungeons extends JavaPlugin {
 		}
 		
 		//pluginの起動前に確認をします
-		if(config.getEnablePlugin() == false){
+		if(!config.getEnablePlugin()){
 			pm.disablePlugins();
 			log.info(logPrefix + config.getName() + " is Disabled! if plugin enable ENABLE_PLUGIN if true.");
 		}
@@ -80,7 +80,7 @@ public class ResorceDungeons extends JavaPlugin {
 		// サーバーリロード時に、既に接続中のプレイヤーに対して、
 		// 移動チェックタスクを仕掛けておく
 		for ( Player player : getServer().getOnlinePlayers() ) {
-			PlayerMoveCheckTask task = new PlayerMoveCheckTask(player);
+			PlayerMoveCheckTask task = new PlayerMoveCheckTask(instance, player);
 			task.runTaskTimerAsynchronously(this, 20, 20);
 		}
 		

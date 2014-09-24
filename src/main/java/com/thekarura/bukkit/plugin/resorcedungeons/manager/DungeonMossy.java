@@ -27,6 +27,10 @@ public class DungeonMossy {
 	
 	private ResorceDungeons instance = ResorceDungeons.getInstance();
 	
+	public DungeonMossy(ResorceDungeons resorcedungeons){
+		this.instance = resorcedungeons;
+	}
+	
 	@SuppressWarnings("deprecation")
 	public void setDungeonMossy(Location loc){
 		
@@ -113,27 +117,25 @@ public class DungeonMossy {
 					block.getRelative(l_5+sp_z, 1, l_6+sp_x).
 					setTypeIdAndData(Material.CHEST.getId(), (byte) 0, true);
 					
+					Location loc_ = new Location(loc.getWorld(),loc.getBlockX() + l_5 + sp_z,loc.getBlockY() + 1,loc.getBlockZ() + l_6 + sp_x);
+					
 					int c_r = Random(5,0);
 					switch (c_r){
+					
 					case 1:
-						new DungeonChest().setChest("Mossy_Life", new Location(loc.getWorld(),
-						loc.getX() + l_5 + sp_z, loc.getY() + 1, loc.getZ() + l_6 + sp_x));
+						new DungeonChest().setChest("Mossy_Life", loc_.getBlock());
 					break;
 					case 2:
-						new DungeonChest().setChest("Mossy_Food", new Location(loc.getWorld(),
-						loc.getX() + l_5 + sp_z, loc.getY() + 1, loc.getZ() + l_6 + sp_x));
+						new DungeonChest().setChest("Mossy_Food", loc_.getBlock());
 					break;
 					case 3:
-						new DungeonChest().setChest("Mossy_Weapon", new Location(loc.getWorld(),
-						loc.getX() + l_5 + sp_z, loc.getY() + 1, loc.getZ() + l_6 + sp_x));
+						new DungeonChest().setChest("Mossy_Weapon", loc_.getBlock());
 					break;
 					case 4:
-						new DungeonChest().setChest("Mossy_Protecto", new Location(loc.getWorld(),
-						loc.getX() + l_5 + sp_z, loc.getY() + 1, loc.getZ() + l_6 + sp_x));
+						new DungeonChest().setChest("Mossy_Protecto", loc_.getBlock());
 					break;
 					default:
-						new DungeonChest().setChest("Mossy_Other", new Location(loc.getWorld(),
-						loc.getX() + l_5 + sp_z, loc.getY() + 1, loc.getZ() + l_6 + sp_x));
+						new DungeonChest().setChest("Mossy_Other", loc_.getBlock());
 					break;
 					}
 					

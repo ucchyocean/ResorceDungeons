@@ -190,7 +190,7 @@ public class DungeonMob {
 				br.close();
 				//ファイル読み込みに失敗した場合
 				log.info(logPrefix + "§4 Error : FileNotFound. (ファイルが存在しません)");
-				Bukkit.broadcastMessage(msgPrefix + "§4 Error : FileNotFound");
+				Bukkit.broadcastMessage(msgPrefix + "§4 Error : FileNotFound" + file + ".rd");
 				return;
 			}
 			

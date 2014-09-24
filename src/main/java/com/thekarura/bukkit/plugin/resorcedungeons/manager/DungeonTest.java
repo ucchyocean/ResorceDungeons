@@ -8,8 +8,6 @@
 
 package com.thekarura.bukkit.plugin.resorcedungeons.manager;
 
-import java.io.File;
-
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 
@@ -19,20 +17,17 @@ import com.thekarura.bukkit.plugin.resorcedungeons.manager.buillder.DungeonBuild
 public class DungeonTest {
 	
 	// instance
-	private static ResorceDungeons instanse = ResorceDungeons.getInstance();
+	private ResorceDungeons instanse = ResorceDungeons.getInstance();
 	
-	//メイン処理
+	public DungeonTest(ResorceDungeons resorcedungeons){
+		this.instanse = resorcedungeons;
+	}
 	
 	public void createDungeonTest(Location loc){
 		
-		String dungeonsdir = instanse.getConfigs().getDungeondir();
 		Block block = loc.getBlock();
 		
-		System.out.println(dungeonsdir+"/Test/Test.rd");
-		
-		File test_test_dungeon = new File(dungeonsdir+"/Test/Test.rd");
-		
-		new DungeonBuilder().DungeonGenerator(test_test_dungeon,block,loc);
+		new DungeonBuilder().DungeonGenerator("Test\\Test",loc);
 		
 		return;
 		

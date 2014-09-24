@@ -107,7 +107,10 @@ public class DungeonJungleCave {
 			switch (chunk.getBlock(x, y, z).getBiome()){
 			
 			case JUNGLE:
+			case JUNGLE_EDGE:
+			case JUNGLE_EDGE_MOUNTAINS:
 			case JUNGLE_HILLS:
+			case JUNGLE_MOUNTAINS:
 				
 				switch (chunk.getBlock(x, y, z).getType()){
 				
@@ -213,7 +216,10 @@ public class DungeonJungleCave {
 			switch (chunk.getBlock(x, y, z).getBiome()){
 			
 			case JUNGLE:
+			case JUNGLE_EDGE:
+			case JUNGLE_EDGE_MOUNTAINS:
 			case JUNGLE_HILLS:
+			case JUNGLE_MOUNTAINS:
 				
 				switch(chunk.getBlock(x, y, z).getType()){
 				case STONE:

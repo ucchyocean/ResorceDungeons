@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.thekarura.bukkit.plugin.resorcedungeons.manager.DungeonMossy;
+import com.thekarura.bukkit.plugin.resorcedungeons.manager.DungeonRuins;
 
 /**
  * プレイヤーの移動を1秒毎にチェックするタスク処理クラス
@@ -22,7 +23,7 @@ public class PlayerMoveCheckTask extends BukkitRunnable {
 	private static final boolean DEBUG = false;
 	
 	// 感知範囲(コンフィグで調整予定)
-	private static final int radius = 50;
+	private int radius;
 	
 	// 追跡対象のプレイヤー
 	private Player player;
@@ -30,12 +31,16 @@ public class PlayerMoveCheckTask extends BukkitRunnable {
 	// 1秒前にプレイヤーが居た位置 の保存用変数
 	private Location prev;
 	
+	private ResorceDungeons instance = ResorceDungeons.getInstance();
+	
 	/**
 	 * コンストラクタ
 	 * @param player 追跡対象のプレイヤー
 	 */
-	public PlayerMoveCheckTask(Player player) {
+	public PlayerMoveCheckTask(ResorceDungeons resorcedungeons, Player player) {
+		this.instance = resorcedungeons;
 		this.player = player;
+		radius = instance.getConfigs().getDUNGEON_GENERATE_TRIGGER_RADIUS();
 	}
 	
 	/**
@@ -188,7 +193,7 @@ public class PlayerMoveCheckTask extends BukkitRunnable {
 							//ダンジョンを習得
 							if (sign.getLine(1).equals("Dungeon")){
 								
-								//MossyDungeonsを習得
+								// ダンジョンIDを検索
 								switch (sign.getLine(2)){
 								
 								//MossyDungeon
@@ -198,7 +203,7 @@ public class PlayerMoveCheckTask extends BukkitRunnable {
 								
 								//Ruins
 								case "Ruin":
-									
+									setRuinDungeon(loc);
 								break;
 								
 								}
@@ -209,8 +214,9 @@ public class PlayerMoveCheckTask extends BukkitRunnable {
 				}
 			}
 		}
-
+		
 		return count;
+		
 	}
 
 	/**
@@ -218,19 +224,39 @@ public class PlayerMoveCheckTask extends BukkitRunnable {
 	 * @param loc 生成場所
 	 */
 	private void setMossyDungeon(final Location loc) {
-
+		
 		new BukkitRunnable() {
-
+			
 			@Override
 			public void run() {
-
+				
 				// 看板とコマンドブロックを削除
 				loc.getBlock().getRelative(BlockFace.UP).setType(Material.AIR);
 				loc.getBlock().setType(Material.AIR);
-
+				
 				// ダンジョン生成
-				new DungeonMossy().setDungeonMossy(loc);
-		}
-		}.runTask(ResorceDungeons.getInstance());
+				new DungeonMossy(instance).setDungeonMossy(loc);
+			}
+			
+		}.runTask(instance);
 	}
+	
+	private void setRuinDungeon(final Location loc) {
+		
+		new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				
+				loc.getBlock().getRelative(BlockFace.UP).setType(Material.AIR);
+				loc.getBlock().setType(Material.AIR);
+				
+				// ダンジョン生成
+				new DungeonRuins(instance).setDungeonRuins(loc);
+			}
+			
+		}.runTask(instance);
+		
+	}
+	
 }

@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import com.thekarura.bukkit.plugin.resorcedungeons.ResorceDungeons;
 import com.thekarura.bukkit.plugin.resorcedungeons.manager.DungeonFloating;
 import com.thekarura.bukkit.plugin.resorcedungeons.manager.DungeonMossy;
+import com.thekarura.bukkit.plugin.resorcedungeons.manager.DungeonRuins;
 import com.thekarura.bukkit.plugin.resorcedungeons.manager.DungeonTest;
 import com.thekarura.bukkit.plugin.resorcedungeons.util.MessageFormats;
 
@@ -66,7 +67,7 @@ public class GenerateCommand implements CommandExecutor {
 						if ( player == Bukkit.getPlayer(instance.getConfigs().getAuther())){
 							//なりすまし対策
 							if (Bukkit.getServer().getOnlineMode()){
-								new DungeonTest().createDungeonTest(loc);
+								new DungeonTest(instance).createDungeonTest(loc);
 							} else {
 								player.sendMessage(msgPrefix + format.MessageFormat(config.getString(
 										"message.generator.test_onlinemode_off", "&aPlease server config is online-mode true!"), name));
@@ -81,13 +82,20 @@ public class GenerateCommand implements CommandExecutor {
 					
 					if ( args[0].equals("Mossy")){
 						
-						new DungeonMossy().setDungeonMossy(loc);
+						new DungeonMossy(instance).setDungeonMossy(loc);
 						return true;
 					}
 					
-					if ( args[0].equals("Ruin") ){
+					if ( args[0].equals("Ruins") ){
 						
+						if (args[1].length() == 0){
+							sender.sendMessage("/RDGenerate Ruins [dungeon name]");
+							return true;
+						}
 						
+						new DungeonRuins(instance).setDungeonRuins(loc ,args[1].toString());
+						
+						return true;
 						
 					}
 					

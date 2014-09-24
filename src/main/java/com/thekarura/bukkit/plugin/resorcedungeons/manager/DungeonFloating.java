@@ -8,11 +8,9 @@
 
 package com.thekarura.bukkit.plugin.resorcedungeons.manager;
 
-import java.io.File;
 import java.util.logging.Logger;
 
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 
 import com.thekarura.bukkit.plugin.resorcedungeons.ResorceDungeons;
 import com.thekarura.bukkit.plugin.resorcedungeons.manager.buillder.DungeonBuilder;
@@ -27,10 +25,7 @@ public class DungeonFloating {
 	
 	public void createDungeonFloating(Location loc){
 		
-		Block block = loc.getBlock();
-		File test_test_dungeon = new File("plugins/ResorceDungeons/Dungeons/Floating/Village_1.rd");
-		
-		new DungeonBuilder().DungeonGenerator(test_test_dungeon,block,loc);
+		new DungeonBuilder().DungeonGenerator("Floating\\Floating",loc);
 		
 		return;
 		

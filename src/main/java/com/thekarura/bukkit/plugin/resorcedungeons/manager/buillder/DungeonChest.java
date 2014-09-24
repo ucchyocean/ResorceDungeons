@@ -9,8 +9,8 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.logging.Logger;
 
-import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
@@ -30,7 +30,7 @@ public class DungeonChest {
 	
 	private int strint = 1;
 	
-	public void setChest(String chestid, Location loc){
+	public void setChest(String chestid, Block block){
 		
 		String chestdir = instance.getConfigs().getChestfile();
 		
@@ -45,7 +45,7 @@ public class DungeonChest {
 				String str;
 				boolean checkfile = true;
 				
-				Chest chest = (Chest) loc.getBlock().getState();
+				Chest chest = (Chest) block.getState();
 				Inventory inv = chest.getBlockInventory();
 				inv.clear();
 				
@@ -166,14 +166,12 @@ public class DungeonChest {
 			} else {
 				br.close();
 				//ファイル読み込みに失敗した場合
-				log.info(logPrefix + "§4 Error : FileNotFound.");
+				log.info(logPrefix + "§4 Error : FileNotFound. "+ file + ".rd");
 				return;
 			}
 			
-		} catch (Exception e) {
-			log.info(logPrefix+"[error]"+ e.getMessage() + "line " + strint);
-			
-			return;
+		} catch(Exception e) {
+			log.info(logPrefix + e.getMessage() + " : " + chestdir + chestid + " is line \"" + strint + "\"");
 		}
 		
 	}

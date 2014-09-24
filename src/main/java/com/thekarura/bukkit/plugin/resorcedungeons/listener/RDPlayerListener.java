@@ -30,7 +30,7 @@ public class RDPlayerListener implements Listener {
 	 * @param event PlayerJoinEventから習得
 	 */
 	@SuppressWarnings("deprecation")
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler
 	public void onPlayerMoveEvent(PlayerJoinEvent event){
 			
 			MessageFormats format = new MessageFormats(instance);
@@ -41,9 +41,9 @@ public class RDPlayerListener implements Listener {
 			final String server_name = instance.getServer().getServerName();
 			final String plugin_name = instance.getConfigs().getName();
 			
-			final String mes = format.MessageFormat("&a" + server_name + " は " + plugin_name + "を導入しています。", player.getName());
+			final String mes = format.MessageFormat("&a \"" + server_name + "\" は " + plugin_name + "を導入しています。", player.getName());
 			
-			if (player == Bukkit.getPlayer(instance.getConfigs().getAuther())){
+			if (player.equals(Bukkit.getPlayer(auther))){
 				
 				new BukkitRunnable(){
 					

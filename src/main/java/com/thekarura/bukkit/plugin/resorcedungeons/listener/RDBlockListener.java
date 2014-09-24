@@ -37,7 +37,7 @@ public class RDBlockListener implements Listener {
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		
 		// 参加したプレイヤーに、1秒毎に動作する非同期処理タイマーを仕掛ける。
-		PlayerMoveCheckTask task = new PlayerMoveCheckTask(event.getPlayer());
+		PlayerMoveCheckTask task = new PlayerMoveCheckTask(instance,event.getPlayer());
 		
 		// タスクを非同期で1秒ごとに実行する
 		task.runTaskTimerAsynchronously(ResorceDungeons.getInstance(), 20, 20);
