@@ -70,6 +70,7 @@ public class PlayerMoveCheckTask extends BukkitRunnable {
 		
 		ArrayList<Location> dungeonLocs = new ArrayList<Location>();
 		Location loc = player.getLocation();
+		@SuppressWarnings("unused")
 		int count = 0;
 		if ( prev != null && prev.distanceSquared(loc) < radius * radius ) {
 			// 1秒前の位置キャッシュがあり、移動距離がradiusの範囲内である（テレポートしていない）場合
@@ -82,40 +83,61 @@ public class PlayerMoveCheckTask extends BukkitRunnable {
 				return;
 			}
 			
-			Location[] minmax = makeMinMaxLocations(loc, prev);
-			Location min = minmax[0];
-			Location max = minmax[1];
+			// 移動した差分のみをチェックする。例えば、radius = 60 の時に、
+			// (0, 70, 0) から (3, 70, 0) に移動したなら、（x座標プラス方向への移動）
+			// 1秒前に既に (-60, 10, -60) から (60, 130, 60) の範囲を既に調査済みなのだから、
+			// (61, 10, -60) から (63, 130, 60) の範囲だけを調査する。
+			// (0, 70, 0) から (-3, 70, 0) に移動したなら、（x座標マイナス方向への移動）
+			// (-63, 10, -60) から (-61, 130, 60) の範囲だけを調査する。
+			// (0, 70, 0) から (3, 65, 0) に移動したなら、（x座標プラス方向とy座標マイナス方向への移動）
+			// (61, 5, -60) x (63, 130, 60) の範囲と、(-60, 5, -60) x (63, 9, 60) の範囲を調査する。
+			
+			Location[] minmax = makeMinMaxLocations(prev, loc);
+			Location min = minmax[0].add(-radius, -radius, -radius);
+			Location max = minmax[1].add(radius, radius, radius);
 			
 			// x方向に移動した場合、"移動した分のブロックだけ"をチェックする
-			if ( loc.getBlockX() != prev.getBlockX() ) {
-				// min{x, y-radius, z-radius} から max{x, y+radius, z+radius} の範囲をサーチ
-				count += search(
-						min.clone().add(0, -radius, -radius),
-						max.clone().add(0, radius, radius),
+			if ( loc.getBlockX() > prev.getBlockX() ) {
+				count += search(loc.getWorld(),
+						prev.getBlockX()+radius+1, min.getBlockY(), min.getBlockZ(),
+						loc.getBlockX()+radius,    max.getBlockY(), min.getBlockZ(),
+						dungeonLocs);
+			} else if ( loc.getBlockX() < prev.getBlockX() ) {
+				count += search(loc.getWorld(),
+						loc.getBlockX()-radius,    min.getBlockY(), min.getBlockZ(),
+						prev.getBlockX()-radius-1, max.getBlockY(), min.getBlockZ(),
 						dungeonLocs);
 			}
-			// y方向に移動した場合も同様。
-			if ( loc.getBlockY() != prev.getBlockY() ) {
-				// min{x-radius, y, z-radius} から max{x+radius, y, z+radius} の範囲をサーチ
-				count += search(
-						min.clone().add(-radius, 0, -radius),
-						max.clone().add(radius, 0, radius),
+			// y方向、z方向に移動した場合も同様。
+			if ( loc.getBlockY() > prev.getBlockY() ) {
+				count += search(loc.getWorld(),
+						min.getBlockX(), prev.getBlockY()+radius+1, min.getBlockZ(),
+						max.getBlockX(), loc.getBlockY()+radius,    min.getBlockZ(),
+						dungeonLocs);
+			} else if ( loc.getBlockY() < prev.getBlockY() ) {
+				count += search(loc.getWorld(),
+						min.getBlockX(), loc.getBlockY()-radius,    min.getBlockZ(),
+						max.getBlockX(), prev.getBlockY()-radius-1, min.getBlockZ(),
 						dungeonLocs);
 			}
-			// z方向に移動した場合も同様。
-			if ( loc.getBlockZ() != prev.getBlockZ() ) {
-				// min{x-radius, y-radius, z} から max{x+radius, y+radius, z} の範囲をサーチ
-				count += search(
-						min.clone().add(-radius, -radius, 0),
-						max.clone().add(radius, radius, 0),
+			if ( loc.getBlockZ() > prev.getBlockZ() ) {
+				count += search(loc.getWorld(),
+						min.getBlockX(), min.getBlockY(), prev.getBlockZ()+radius+1,
+						max.getBlockX(), max.getBlockY(), loc.getBlockZ()+radius,
+						dungeonLocs);
+			} else if ( loc.getBlockZ() < prev.getBlockZ() ) {
+				count += search(loc.getWorld(),
+						min.getBlockX(), min.getBlockY(), loc.getBlockZ()-radius,
+						max.getBlockX(), max.getBlockY(), prev.getBlockZ()-radius-1,
 						dungeonLocs);
 			}
 			
 		} else {
 			// 1秒前の位置キャッシュが無い場合、しかたがないので全範囲をサーチする
-			Location min = loc.clone().add(-radius, -radius, -radius);
-			Location max = loc.clone().add(radius, radius, radius);
-			count += search(min, max, dungeonLocs);
+			count += search(loc.getWorld(),
+					loc.getBlockX()-radius, loc.getBlockY()-radius, loc.getBlockZ()-radius,
+					loc.getBlockX()+radius, loc.getBlockY()+radius, loc.getBlockZ()+radius,
+					dungeonLocs);
 			
 		}
 		
@@ -170,7 +192,7 @@ public class PlayerMoveCheckTask extends BukkitRunnable {
 		Location max = new Location(loc1.getWorld(), max_x, max_y, max_z);
 		return new Location[]{min, max};
 	}
-
+	
 	/**
 	 * minの位置からmaxの位置まで、コマンドブロックの上に立っている看板を探し、
 	 * 対象物が見つかったら削除して、ダンジョンを生成します。
@@ -179,14 +201,20 @@ public class PlayerMoveCheckTask extends BukkitRunnable {
 	 * @param dungeonLocs 見つかったダンジョン生成位置を返すための配列
 	 * @return サーチしたブロックの個数
 	 */
-	private int search(Location min, Location max, ArrayList<Location> dungeonLocs) {
+	private int search(World world, int min_x, int min_y, int min_z,
+			int max_x, int max_y, int max_z, ArrayList<Location> dungeonLocs) {
 		
 		//ループ処理で特定のブロックを探します
-		World world = min.getWorld();
+		if ( min_y < 0 ) {
+			min_y = 0;
+		}
+		if ( max_y > world.getMaxHeight() ) {
+			max_y = world.getMaxHeight();
+		}
 		int count = 0;
-		for (int x = min.getBlockX(); x < max.getBlockX(); x++ ){
-			for (int y = min.getBlockY(); y < max.getBlockY(); y++ ){
-				for (int z = min.getBlockZ(); z < max.getBlockZ(); z++ ){
+		for (int x = min_x; x < max_x; x++ ){
+			for (int y = min_y; y < max_y; y++ ){
+				for (int z = min_z; z < max_z; z++ ){
 					count++;
 					
 					/* コマンドブロックの上に立っている看板を探します
@@ -222,7 +250,7 @@ public class PlayerMoveCheckTask extends BukkitRunnable {
 		
 		return count;
 	}
-
+	
 	/**
 	 * ダンジョンを同期処理で生成します。
 	 * @param locations
@@ -291,5 +319,4 @@ public class PlayerMoveCheckTask extends BukkitRunnable {
 		// ダンジョン生成
 		new DungeonRuins(instance).setDungeonRuins(loc);
 	}
-
 }
